@@ -11,7 +11,12 @@ GM.Website = "github.com/LostTrackpad/beatrun-forked"
 
 include("player_class/player_beatrun.lua")
 
-include("preexecute/shared.lua")
+-- include() was failing here, doing it like this makes beatrun fucking WORK
+CrueltyParkour = CreateConVar("Beatrun_CrueltyParkour", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Also known as \"Cruelty Mode\".\nDisables some Beatrun parkour abilities using anything but the Beatrun hands when enabled.", 0, 1)
+
+SlippyWallrun = CreateConVar("Beatrun_Experimentals_SlippyWallrun", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Makes your wallrun slippy. Only usable with Cruelty Parkour on.", 0, 1)
+
+UseOldAnims = CreateConVar("Beatrun_UseOldAnims", 0, {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Use Mirror's Edge animations instead of the reanimated ones.", 0, 1)
 
 for _, v in ipairs(file.Find("gamemodes/beatrun/gamemode/sh/*.lua", "GAME", "nameasc")) do
 	AddCSLuaFile("sh/" .. v)
