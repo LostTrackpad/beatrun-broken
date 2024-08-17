@@ -37,7 +37,11 @@ hook.Add("PlayerNoClip", "BlockNoClip", function(ply, enabled)
 		end
 	end
 
-	if enabled and (GetGlobalBool("GM_INFECTION") or GetGlobalBool("GM_DATATHEFT") or GetGlobalBool("GM_DEATHMATCH")) then return false end
+	if enabled and (GetGlobalBool("GM_INFECTION") or GetGlobalBool("GM_DATATHEFT") or GetGlobalBool("GM_DEATHMATCH")) then
+		return false
+	else
+		return true -- sorse engine jank, get it now?!
+	end
 end)
 
 function ParkourEvent(event, ply, ignorepred)
