@@ -14,6 +14,7 @@ http.Fetch("https://raw.githubusercontent.com/JonnyBro/beatrun/main/version.txt"
 		if body ~= VERSIONGLOBAL then
 			file.Write("beatrun/version.txt", body)
 		else
+			if file.Exists("beatrun/version.txt", "DATA") then file.Delete("beatrun/version.txt") end
 			print("Latest version already")
 		end
 	else

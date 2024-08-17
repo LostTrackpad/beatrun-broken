@@ -7,7 +7,7 @@ DeriveGamemode("sandbox")
 GM.Name = "Beatrun"
 GM.Author = "N/A"
 GM.Email = "N/A"
-GM.Website = "github.com/LostTrackpad/beatrun-forked" -- this is my fork, duh
+GM.Website = "github.com/LostTrackpad/beatrun-forked"
 
 include("player_class/player_beatrun.lua")
 
