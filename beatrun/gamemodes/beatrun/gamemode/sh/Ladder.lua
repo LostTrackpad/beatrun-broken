@@ -367,7 +367,7 @@ end
 if CLIENT then
 	preladderwep = ""
 	hook.Add("HUDPaint", "NoGunsOnLadders", function()	
-		if !LocalPlayer():Alive() then return end
+		if !IsValid(LocalPlayer():GetActiveWeapon()) then return end
 		if LocalPlayer():GetActiveWeapon():GetClass() != "runnerhands" and IsValid(LocalPlayer():GetLadder()) then -- :troll:
 			preladderwep = LocalPlayer():GetActiveWeapon():GetClass()
 			input.SelectWeapon(LocalPlayer():GetWeapon("runnerhands"))

@@ -215,7 +215,7 @@ function PLAYER:Spawn()
 		end
 	end
 
-	if not ply.InReplay and not CPSave then
+	if not CPSave then
 		ply:SetNW2Float("CPNum", 1)
 	end
 

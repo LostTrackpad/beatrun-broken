@@ -41,6 +41,7 @@ local screencolor = Color(64, 0, 0, 64)
 
 function ENT:StartTouch(ent)
 	if ent:IsPlayer() and Course_Name ~= "" and not ent.BuildMode and ent:GetNW2Int("CPNum", 1) == self:GetCPNum() then
+		print(ent:Nick())
 		ent:SetNW2Int("CPNum", ent:GetNW2Int("CPNum", 1) + 1)
 
 		if ent:GetNW2Int("CPNum", 1) > table.Count(Checkpoints) then
@@ -84,7 +85,7 @@ local asize = 32
 function ENT:DrawTranslucent()
 	self:SetRenderBounds(minb, maxb)
 
-	if (not BuildMode and CheckpointNumber ~= self:GetCPNum()) and not LocalPlayer().InReplay then return end
+	if (not BuildMode and CheckpointNumber ~= self:GetCPNum()) then return end
 
 	render.SetColorMaterial()
 
@@ -132,7 +133,7 @@ end
 local circlesprite = Material("circle.png", "nocull")
 
 function ENT:DrawLOC()
-	if (not BuildMode and CheckpointNumber ~= self:GetCPNum()) and not LocalPlayer().InReplay then return end
+	if (not BuildMode and CheckpointNumber ~= self:GetCPNum()) then return end
 
 	render.SetMaterial(circlesprite)
 

@@ -1,13 +1,13 @@
+local postprocessenable = CreateClientConVar("Beatrun_PostprocessEffects", 0, true, false, "Enables silly ahh post-processing effects. EXPERIMENTAL.", 0, 1)
+
 local function MyNeedsDepthPass()
+	if !postprocessenable:GetBool() then return false end
+	DOFModeHack(postprocessenable:GetBool())
     return true
 end
 
-doffocus = CreateClientConVar("doftest_focus", 0, true, false, "", 0, 1)
-doffocus2 = CreateClientConVar("doftest_focus2", 0, true, false, "", 0, 1)
-local postprocessenable = CreateClientConVar("Beatrun_PostprocessEffects", 0, true, false, "Enables silly ahh post-processing effects. EXPERIMENTAL.", 0, 1)
-
 -- Add hook so that the _rt_ResolvedFullFrameDepth texture is updated
-hook.Add( "NeedsDepthPass", "MyNeedsDepthPass", MyNeedsDepthPass )
+--hook.Add( "NeedsDepthPass", "MyNeedsDepthPass", MyNeedsDepthPass )
 
 local blur_mat = Material('pp/bokehblur')
 local BOKEN_FOCUS = 0
