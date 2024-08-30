@@ -1775,7 +1775,7 @@ local function JumpThink()
 			end
 
 			if BodyAnimString:Left(6) == "ladder" and BodyAnimString ~= "ladderclimbdownfast" then
-				BodyLimitX = 25
+				BodyLimitX = 80
 				BodyLimitY = 90
 				ang = ply.OrigEyeAng
 
