@@ -769,7 +769,7 @@ hook.Add("CreateMove", "BodyAnim_Mouse", function(cmd)
 		local oang = ply.OrigEyeAng
 		local limitx = BodyLimitX or 30
 		local limity = BodyLimitY or 50
-		print(limity)
+		--print(limity)
 
 		pastlimitx = limitx < math.AngleDifference(nang.x, oang.x) and not has_tool_equipped
 		pastlimity = limity < math.abs(math.AngleDifference(nang.y, oang.y)) and not has_tool_equipped
