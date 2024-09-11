@@ -20,7 +20,7 @@ Fully open sourced and maintained by the community (like 4 people I think).
 
 ## Automatic Installation?
 
-Not supported. I (LostTrackpad) am not going to set this up.[^2]
+Not supported for this version, nor will it ever be. How hard is installing Beatrun anyway? It's just extracting a folder.[^2]
 
 ## Manual Installation
 
@@ -46,7 +46,6 @@ Not supported. I (LostTrackpad) am not going to set this up.[^2]
 > ***May*** work on Windows 7/8, but those versions of Windows are **no longer supported**! You really should upgrade if you're running either of those, and I will not provide support!
 
 If you're ready and willing to use this method, read [this](repocontent/WindowsGitInstallGuide.md) guide to continue.
-
 
 ## Animations
 
@@ -114,4 +113,4 @@ I'm not kidding, check there first for problems. ***Do not** report issues with 
 * [YuRaNnNzZZ](https://github.com/YuRaNnNzZZ/gmcl_steamrichpresencer) for Steam Presence module
 
 [^1]: *A Steam account with a copy of Garry's Mod is required. Ask them why if you're curious.*
-[^2]: *I already tried to set up a webserver on my PC. It failed. I don't want people spamming requests for the install script to my PC either, and I know Cloudflare is a thing. Maybe I'll try GitHub Pages?*
+[^2]: *I am also lazy, maintaining PowerShell scripts isn't something I can do, and doing this in my view doesn't add anything but open a window for more annoying issues from people who don't know what they're doing.*
