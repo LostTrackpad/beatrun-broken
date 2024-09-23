@@ -262,7 +262,7 @@ local function BeatrunHUD()
 		surface.DrawText(nicktext)
 		surface.SetDrawColor(25, 25, 25, math.max(255 - hidealpha, 2))
 		surface.DrawRect(scrw * 0.015 + vp.z, scrh * 0.94 + 1 + vp.x, SScaleX(150), SScaleY(4))
-		surface.SetDrawColor(string.ToColor(ply:GetInfo("Beatrun_HUDTextColor")), math.max(255 - hidealpha, 2))
+		surface.SetDrawColor(text_color.r, text_color.g, text_color.b, math.max(255 - hidealpha, 2))
 		surface.DrawRect(scrw * 0.015 + vp.z, scrh * 0.94 + vp.x, SScaleX(150 * math.min(ply:GetLevelRatio(), 1)), SScaleY(5))
 
 		for k, v in pairs(XP_floatingxp) do
