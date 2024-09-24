@@ -68,7 +68,7 @@ if CLIENT then
 	hook.Add("HUDPaint", "MomentumShieldHUD", function()
 		local ply = LocalPlayer()
 
-		if !IsValid(ply) then return end
+		if !IsValid(ply) or !momentumshield:GetBool() then return end
 
 		local shieldpercent = ply:GetNWFloat("MomentumShieldPer", 0)
 
