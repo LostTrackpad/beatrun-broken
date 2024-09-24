@@ -152,8 +152,8 @@ hook.Add("PopulateToolMenu", "Beatrun_ToolMenu", function()
 		panel:ClearControls()
 		panel:SetName("#beatrun.toolsmenu.hud.desc")
 
-		panel:CheckBox("#beatrun.toolsmenu.hud.buttonhints", "Beatrun_HUDButtonHints")
-		panel:ControlHelp("#beatrun.toolsmenu.hud.buttonhintsdesc")
+		panel:CheckBox("HUD: Button Hints", "Beatrun_HUDButtonHints")
+		panel:ControlHelp("Show button hints on the bottom right of your display.")
 
 		panel:CheckBox("#beatrun.toolsmenu.hud.dynamic", "Beatrun_HUDDynamic")
 		panel:ControlHelp("#beatrun.toolsmenu.hud.dynamicdesc")
@@ -352,9 +352,6 @@ hook.Add("PopulateToolMenu", "Beatrun_ToolMenu", function()
 
 		panel:CheckBox("#beatrun.randommwloadouts", "Beatrun_RandomMWLoadouts")
 		panel:ControlHelp("#beatrun.randommwloadoutsdesc")
-
-		panel:CheckBox("#beatrun.randoarc9loadouts", "Beatrun_RandomARC9Loadouts")
-		panel:ControlHelp("#beatrun.randoarc9loadoutsdesc")
 
 		local DatatheftButton = vgui.Create("DButton", panel)
 		DatatheftButton:SetText("#beatrun.toolsmenu.gamemodes.datatheft")
