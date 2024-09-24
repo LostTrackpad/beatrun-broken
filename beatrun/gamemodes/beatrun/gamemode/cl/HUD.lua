@@ -209,7 +209,7 @@ local function BeatrunHUD()
 
 	if not hidden:GetBool() then
 		if dynamic:GetBool() then
-			hidealpha = math.Approach(hidealpha, 150 * ply:GetVelocity():Length() / 250, 100 * RealFrameTime())
+			hidealpha = math.Approach(hidealpha, 150 * ply:GetVelocity():Length() / 250, 200 * RealFrameTime())
 		else
 			hidealpha = 0
 		end
@@ -224,7 +224,7 @@ local function BeatrunHUD()
 		DrawBlurRect(20 + vp.z, scrh * 0.895 + vp.x, SScaleX(bgpadding), SScaleY(85), math.max(255 - hidealpha, 2))
 
 		local corner_color = string.ToColor(ply:GetInfo("Beatrun_HUDCornerColor"))
-		corner_color.a = dynamic:GetBool() and math.max(100 - hidealpha, 50) or corner_color.a
+		corner_color.a = dynamic:GetBool() and math.max(100 - hidealpha, 2) or corner_color.a
 
 		local text_color = string.ToColor(ply:GetInfo("Beatrun_HUDTextColor"))
 		text_color.a = dynamic:GetBool() and math.max(255 - hidealpha, 2) or text_color.a
