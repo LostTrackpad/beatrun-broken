@@ -58,6 +58,8 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 	local text_color = string.ToColor(ply:GetInfo("Beatrun_HUDTextColor"))
 	local box_color = string.ToColor(ply:GetInfo("Beatrun_HUDCornerColor"))
 
+	local RestartAtCheckpoint = GetConVar("Beatrun_CPSave"):GetBool()
+
 	local QuickturnGround = GetConVar("Beatrun_QuickturnGround"):GetBool()
 	local QuickturnHandsOnly = GetConVar("Beatrun_QuickturnHandsOnly"):GetBool()
 	
@@ -68,6 +70,13 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 
 	surface.SetFont("BeatrunButtons")
 	fontheight = select(2, surface.GetTextSize("Test String")) * 1.5
+
+	if Course_Name != "" and RestartAtCheckpoint and ply:GetNW2Int("CPNum", -1) > 1 then
+		ButtonsTable[#ButtonsTable + 1] = {"Restart From Checkpoint", {GetFormattedKey("+reload")}}
+		ButtonsTable[#ButtonsTable + 1] = {"Restart Course", {GetFormattedKey("+reload"), "HELDPRESS"}}
+	elseif Course_Name != "" then
+		ButtonsTable[#ButtonsTable + 1] = {"Restart Course", {GetFormattedKey("+reload")}}
+	end
 
 	if ply:OnGround() and ply:UsingRH() and !QuickturnSpecialCase then
 		ButtonsTable[#ButtonsTable + 1] = {"Quickstep", {GetFormattedKey("+attack2"), "AND", GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
