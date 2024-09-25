@@ -55,6 +55,9 @@ surface.CreateFont("BeatrunButtonsSmall", {
 hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 	if !buttonhints:GetBool() then return end
 	local ply = LocalPlayer()
+
+	if ply.FallStatic then return end -- you're certainly dead by that point, can't even do anything
+
 	local text_color = string.ToColor(ply:GetInfo("Beatrun_HUDTextColor"))
 	local box_color = string.ToColor(ply:GetInfo("Beatrun_HUDCornerColor"))
 
@@ -97,9 +100,9 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 	end
 
 	if !ply:OnGround() and !ply:GetCrouchJump() and !ply:GetDive() then
-		if ply:GetVelocity():Length2D() > 220 and ply:GetVelocity().z <= -450 and !QuickturnSpecialCase then
+		if ply:GetVelocity():Length2D() > 220 and ply:GetVelocity().z <= -350 and !QuickturnSpecialCase then
 			ButtonsTable[#ButtonsTable + 1] = {"Safety Roll", {GetFormattedKey("+duck"), "TIMEDPRESS"}}
-		elseif ply:GetVelocity().z <= -450 and !QuickturnSpecialCase then
+		elseif ply:GetVelocity().z <= -350 and !QuickturnSpecialCase then
 			ButtonsTable[#ButtonsTable + 1] = {"Safe Landing", {GetFormattedKey("+duck"), "TIMEDPRESS"}}
 		end
 	end
