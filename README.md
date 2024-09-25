@@ -62,6 +62,7 @@ If you're ready and willing to use this method, read [this](repocontent/WindowsG
   * Kick glitch behavior type toggle (yep, original kick glitch is still usable!) - `Beatrun_OldKickGlitch` to toggle
 * In-game configuration menu - you can find it in the spawn menu, in the **`Beatrun`** category\
   ***Most*** Beatrun settings can now be configured there! Use `cvarlist beatrun_` to list *all* Beatrun options (and some commands), including some I didn't list
+* Button hints in bottom right corner for people who don't know controls *(made by me!, not a substitute for watching a tutorial)*
 * Discord and Steam Presence *(only Discord presence is new actually)*
 * Localization support.\
   Now in 7 languages *(mostly, some stuff is locked in English)*!
