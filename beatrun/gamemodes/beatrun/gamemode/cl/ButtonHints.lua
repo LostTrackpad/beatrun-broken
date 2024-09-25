@@ -183,6 +183,4 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 
 		draw.DrawText(ButtonsTable[ButtonOrder][1], "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
 	end
-
-	PrintTable(ButtonsTable)
 end)
