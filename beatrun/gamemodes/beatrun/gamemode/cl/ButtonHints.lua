@@ -2,7 +2,7 @@
 
 local buttonhints = CreateClientConVar("Beatrun_HUDButtonHints", "1", true, false, "Show button hints on the bottom-right of your display when enabled.", 0, 1)
 
-local function GetValidKey(bind)
+local function GetFormattedKey(bind)
 	string = input.LookupBinding(bind)
 
 	if string == "MOUSE1" then string = "LMB"      -- Don't localize LMB and RMB. Maybe.
@@ -10,7 +10,7 @@ local function GetValidKey(bind)
 	elseif string == "MOUSE3" then string = "Wheel Click" end
 
 	if string then
-		return string
+		return string.upper(string)
 	else
 		return "UNBOUND"
 	end
@@ -55,8 +55,6 @@ surface.CreateFont("BeatrunButtonsSmall", {
 hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 	if !buttonhints:GetBool() then return end
 	local ply = LocalPlayer()
-	local wep = ply:GetActiveWeapon()
-	if !ply:Alive() or !IsValid(wep) then return end
 	local text_color = string.ToColor(ply:GetInfo("Beatrun_HUDTextColor"))
 	local box_color = string.ToColor(ply:GetInfo("Beatrun_HUDCornerColor"))
 
@@ -66,156 +64,62 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 	local QuickturnSpecialCase = ply:GetClimbing() != 0 or ply:GetMantle() >= 4 or ply:GetWallrun() != 0 or IsValid(ply:GetLadder()) or ply:GetGrappling() or ply:GetDive() or ply:GetSliding() or IsValid(ply:GetBalanceEntity()) or IsValid(ply:GetZipline())
 	-- Case-catcher (?) for when quickturn/sidestep prompt shouldn't appear.
 
+	local ButtonsTable = {} -- initialize/clear button table
+
 	surface.SetFont("BeatrunButtons")
 	fontheight = select(2, surface.GetTextSize("Test String")) * 1.5
 
-	if ply:OnGround() and wep:GetClass() == "runnerhands" and not QuickturnSpecialCase then
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - fontheight - ScreenScaleH(10) - ScreenScaleH(2), string.upper(GetValidKey("+attack2")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack2")))) + ScreenScaleH(4)
-		draw.DrawText("+", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight, text_color, 	TEXT_ALIGN_RIGHT)
-		tw = tw + select(1, surface.GetTextSize("+"))
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) - tw, ScrH() - fontheight - ScreenScaleH(10) - ScreenScaleH(2), string.upper(GetValidKey("+moveright")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = tw + select(1, surface.GetTextSize(string.upper(GetValidKey("+moveright")))) + ScreenScaleH(4)
-		draw.DrawText("/", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight, text_color, 	TEXT_ALIGN_RIGHT)
-		tw = tw + select(1, surface.GetTextSize("/"))
-		draw.WordBox(ScreenScaleH(2), ScrW() - tw - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight, string.upper(GetValidKey("+moveleft")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = tw + select(1, surface.GetTextSize(string.upper(GetValidKey("+moveleft"))))
-		draw.DrawText("Sidestep ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight - ScreenScaleH(10), 	text_color, TEXT_ALIGN_RIGHT)
+	if ply:OnGround() and ply:UsingRH() and !QuickturnSpecialCase then
+		ButtonsTable[#ButtonsTable + 1] = {"Quickstep", {GetFormattedKey("+attack2"), "AND", GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
 	end
 
-	if (!ply:OnGround() and !QuickturnSpecialCase and wep:GetClass() == "runnerhands") or (wep:GetClass() != "runnerhands" and not QuickturnHandsOnly and (!ply:OnGround() or QuickturnGround)) then
+	if (!ply:OnGround() or QuickturnGround) and (ply:UsingRH() or (ply:notUsingRH() and !QuickturnHandsOnly)) and not QuickturnSpecialCase then
+		ButtonsTable[#ButtonsTable + 1] = {"Quickturn", {GetFormattedKey("+attack2")}}
+	end
+
+	if !ply:OnGround() and ply:UsingRH() and not QuickturnSpecialCase then
+		if !ply:GetDive() then
+			ButtonsTable[#ButtonsTable + 1] = {"Dive", {GetFormattedKey("+duck"), "AND", GetFormattedKey("+attack2")}}
+		end
+
 		if !ply:GetCrouchJump() then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+duck"))))
-			draw.DrawText("Coil ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+			ButtonsTable[#ButtonsTable + 1] = {"Coil", {GetFormattedKey("+duck")}}
 		end
-
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - fontheight * 2 - ScreenScaleH(10) - ScreenScaleH(2), string.upper(GetValidKey("+attack2")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack2")))) + ScreenScaleH(4)
-		draw.DrawText("+", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight * 2, text_color, 	TEXT_ALIGN_RIGHT)
-		tw = tw + select(1, surface.GetTextSize("+"))
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) - tw, ScrH() - fontheight * 2 - ScreenScaleH(10) - ScreenScaleH(2), string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = tw + select(1, surface.GetTextSize(string.upper(GetValidKey("+duck")))) + ScreenScaleH(4)
-		draw.DrawText("Dive ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 2 - ScreenScaleH(10), 	text_color, TEXT_ALIGN_RIGHT)
-
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight, string.upper(GetValidKey("+attack2")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack2"))))
-		draw.DrawText("Quickturn ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-	elseif ply:OnGround() and QuickturnGround and !QuickturnSpecialCase and wep:GetClass() == "runnerhands" then 
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 2, string.upper(GetValidKey("+attack2")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack2"))))
-		draw.DrawText("Quickturn ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 2 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
 	end
 
-	if !ply:OnGround() and !ply:GetDive() and !ply:GetCrouchJump() then
-		if !ply:OnGround() and ply:GetVelocity():Length2D() > 220 and ply:GetVelocity().z <= -450 and !QuickturnSpecialCase then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 4, string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+duck"))))
-			draw.DrawText("Safety Roll (Timed) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 4 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-		elseif !ply:OnGround() and ply:GetVelocity().z <= -450 and !QuickturnSpecialCase then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 4, string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+duck"))))
-			draw.DrawText("Safe Landing ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 4 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+	if !ply:OnGround() and !ply:GetCrouchJump() and !ply:GetDive() then
+		if ply:GetVelocity():Length2D() > 220 and ply:GetVelocity().z <= -450 and !QuickturnSpecialCase then
+			ButtonsTable[#ButtonsTable + 1] = {"Safety Roll", {GetFormattedKey("+duck"), "TIMEDPRESS"}}
+		elseif ply:GetVelocity().z <= -450 and !QuickturnSpecialCase then
+			ButtonsTable[#ButtonsTable + 1] = {"Safe Landing", {GetFormattedKey("+duck"), "TIMEDPRESS"}}
 		end
-		
-		if ply:GetMantle() == 2 and ply:GetVelocity().z <= -450 then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 5, string.upper(GetValidKey("+jump")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+jump"))))
-			draw.DrawText("Springboard (Hold) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 5 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-		elseif ply:GetMantle() == 2 then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 4, string.upper(GetValidKey("+jump")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+jump"))))
-			draw.DrawText("Springboard (Hold) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 4 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-		end
-	elseif !ply:OnGround() and !ply:GetDive() then
-		if !ply:OnGround() and ply:GetVelocity():Length2D() > 220 and ply:GetVelocity().z <= -450 and !QuickturnSpecialCase then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+duck"))))
-			draw.DrawText("Safety Roll (Timed) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-		elseif !ply:OnGround() and ply:GetVelocity().z <= -450 and !QuickturnSpecialCase then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+duck"))))
-			draw.DrawText("Safe Landing (Timed) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-		end
+	end
 
-		if ply:GetMantle() == 2 and ply:GetVelocity().z <= -450 then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 5, string.upper(GetValidKey("+jump")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+jump"))))
-			draw.DrawText("Springboard (Hold) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 5 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-		elseif ply:GetMantle() == 2 then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 4, string.upper(GetValidKey("+jump")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+jump"))))
-			draw.DrawText("Springboard (Hold) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 4 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-		end
-	elseif ply:GetMantle() == 2 then
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+jump")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+jump"))))
-		draw.DrawText("Springboard (Hold) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+	if ply:GetMantle() == 2 then
+		ButtonsTable[#ButtonsTable + 1] = {"Springboard", {GetFormattedKey("+jump"), "HELDPRESS"}}
 	end
 
 	if ply:GetClimbing() != 0 then
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 2, string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+duck"))))
-		draw.DrawText("Drop ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 2 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-		
 		local ang = EyeAngles()
 		ang = math.abs(math.AngleDifference(ang.y, ply.wallang.y))
-		if ang <= 42 then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight, string.upper(GetValidKey("+forward")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+forward"))))
-			draw.DrawText("Climb Up ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-		else
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight, string.upper(GetValidKey("+jump")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+jump"))))
-			draw.DrawText("Jump Off ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-		end
 
-		tw = 0
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) - tw, ScrH() - fontheight * 3 - ScreenScaleH(10) - ScreenScaleH(2), string.upper(GetValidKey("+moveright")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = tw + select(1, surface.GetTextSize(string.upper(GetValidKey("+moveright")))) + ScreenScaleH(4)
-		draw.DrawText("/", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight * 3, text_color, 	TEXT_ALIGN_RIGHT)
-		tw = tw + select(1, surface.GetTextSize("/"))
-		draw.WordBox(ScreenScaleH(2), ScrW() - tw - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+moveleft")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = tw + select(1, surface.GetTextSize(string.upper(GetValidKey("+moveleft"))))
-		draw.DrawText("Move ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), 	text_color, TEXT_ALIGN_RIGHT)
+		ButtonsTable[#ButtonsTable + 1] = {"Move", {GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
+		ButtonsTable[#ButtonsTable + 1] = {"Drop", {GetFormattedKey("+duck")}}
+		if ang <= 42 then
+			ButtonsTable[#ButtonsTable + 1] = {"Climb Up", {GetFormattedKey("+forward")}}
+		else
+			ButtonsTable[#ButtonsTable + 1] = {"Jump Off", {GetFormattedKey("+jump"), "AND", GetFormattedKey("+forward")}}
+		end
 	end
 
 	if ply:GetWallrun() == 1 then
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - fontheight * 3 - ScreenScaleH(10) - ScreenScaleH(2), string.upper	(GetValidKey("+jump")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+jump")))) + ScreenScaleH(4)
-		draw.DrawText("+", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight * 3, text_color, 	TEXT_ALIGN_RIGHT)
-		tw = tw + select(1, surface.GetTextSize("+"))
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) - tw, ScrH() - fontheight * 3 - ScreenScaleH(10) - ScreenScaleH(2), string.upper(GetValidKey("+moveright")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = tw + select(1, surface.GetTextSize(string.upper(GetValidKey("+moveright")))) + ScreenScaleH(4)
-		draw.DrawText("/", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight * 3, text_color, 	TEXT_ALIGN_RIGHT)
-		tw = tw + select(1, surface.GetTextSize("/"))
-		draw.WordBox(ScreenScaleH(2), ScrW() - tw - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+moveleft")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = tw + select(1, surface.GetTextSize(string.upper(GetValidKey("+moveleft"))))
-		draw.DrawText("Side Jump ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 2, string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+duck"))))
-		draw.DrawText("Cancel Wallclimb ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 2 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight, string.upper(GetValidKey("+attack2")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack2"))))
-		draw.DrawText("Quickturn (180°) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+		ButtonsTable[#ButtonsTable + 1] = {"Quickturn", {GetFormattedKey("+attack2")}}
+		ButtonsTable[#ButtonsTable + 1] = {"Cancel Wallclimb", {GetFormattedKey("+duck")}}
+		ButtonsTable[#ButtonsTable + 1] = {"Side Jump", {GetFormattedKey("+jump"), "AND", GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
 	elseif ply:GetWallrun() != 0 then
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 4, string.upper(GetValidKey("+attack")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack"))))
-		draw.DrawText("Attack (Kickglitch) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 4 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+jump")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+jump"))))
-		draw.DrawText("Jump Off ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 2, string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+duck"))))
-		draw.DrawText("Cancel Wallrun ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 2 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight, string.upper(GetValidKey("+attack2")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack2"))))
-		draw.DrawText("Quickturn (90°) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+		ButtonsTable[#ButtonsTable + 1] = {"Quickturn", {GetFormattedKey("+attack2")}}
+		ButtonsTable[#ButtonsTable + 1] = {"Cancel Wallclimb", {GetFormattedKey("+duck")}}
+		ButtonsTable[#ButtonsTable + 1] = {"Jump", {GetFormattedKey("+jump")}}
 	end
 
 	if IsValid(ply:GetLadder()) then
@@ -227,65 +131,58 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 		util.TraceLine(tr)
 		local fraction = ply.LadderTraceOut.Fraction
 
-		tw = 0
 		if ((fraction or 1) <= 0.35) then
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+forward")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = tw + select(1, surface.GetTextSize(string.upper(GetValidKey("+forward"))))
-			draw.DrawText("Climb (Hold) ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+			ButtonsTable[#ButtonsTable + 1] = {"Climb Up", {GetFormattedKey("+forward"), "HELDPRESS"}}
 		else
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - fontheight * 3 - ScreenScaleH(10) - ScreenScaleH(2), string.upper	(GetValidKey("+jump")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+jump")))) + ScreenScaleH(4)
-			draw.DrawText("+", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight * 3, text_color, 	TEXT_ALIGN_RIGHT)
-			tw = tw + select(1, surface.GetTextSize("+"))	
-			draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+forward")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-			tw = tw + select(1, surface.GetTextSize(string.upper(GetValidKey("+forward"))))
-			draw.DrawText("Jump ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+			ButtonsTable[#ButtonsTable + 1] = {"Jump", {GetFormattedKey("+jump")}}
 		end
 
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 2, string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+duck"))))
-		draw.DrawText("Drop ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 2 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight, string.upper(GetValidKey("+attack2")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack2"))))
-		draw.DrawText("Quickturn ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+		ButtonsTable[#ButtonsTable + 1] = {"Slide Down", {GetFormattedKey("+back"), "HELDPRESS"}}
+		ButtonsTable[#ButtonsTable + 1] = {"Drop", {GetFormattedKey("+duck")}}
+	elseif IsValid(ply:GetBalanceEntity()) then
+		ButtonsTable[#ButtonsTable + 1] = {"Balance", {GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
+		ButtonsTable[#ButtonsTable + 1] = {"Turn Around", {GetFormattedKey("+attack2")}}
+		ButtonsTable[#ButtonsTable + 1] = {"Move Forward", {GetFormattedKey("+forward")}}
+	elseif IsValid(ply:GetZipline()) then
+		ButtonsTable[#ButtonsTable + 1] = {"Drop", {GetFormattedKey("+duck")}}
+	elseif ply:GetGrappling() then
+		ButtonsTable[#ButtonsTable + 1] = {"Jump", {GetFormattedKey("+jump")}}
+		ButtonsTable[#ButtonsTable + 1] = {"Extend Grapple", {GetFormattedKey("+attack2")}}
+		ButtonsTable[#ButtonsTable + 1] = {"Shorten Grapple", {GetFormattedKey("+attack")}}
 	end
 
-	if ply:GetGrappling() then
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+attack")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack"))))
-		draw.DrawText("Shorten Grapple ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+	for i=1,#ButtonsTable do
+		local ButtonOrder = i
+		local LineOffset = math.max(ButtonOrder - 1, 0)
+		local ContainsSpecialText = false
 
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 2, string.upper(GetValidKey("+attack2")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack2"))))
-		draw.DrawText("Extend Grapple ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 2 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+		tw = 0
+		for i=1,#ButtonsTable[ButtonOrder][2] do
+			if ButtonsTable[ButtonOrder][2][i] == "TIMEDPRESS" then
+				draw.DrawText("(Timed)", "BeatrunButtonsSmall", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(2), ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
+				--surface.SetFont("BeatrunButtonsSmall")
+				tw = tw + surface.GetTextSize("(Timed)")
+				ContainsSpecialText = true
+			elseif ButtonsTable[ButtonOrder][2][i] == "HELDPRESS" then
+				draw.DrawText("(Hold)", "BeatrunButtonsSmall", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(2), ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
+				--surface.SetFont("BeatrunButtonsSmall")
+				tw = tw + surface.GetTextSize("(Hold)")
+				ContainsSpecialText = true
+			elseif ButtonsTable[ButtonOrder][2][i] == "OR" then
+				draw.DrawText("/", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
+				tw = tw + surface.GetTextSize("/")
+			elseif ButtonsTable[ButtonOrder][2][i] == "AND" then
+				draw.DrawText("+", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
+				tw = tw + surface.GetTextSize("+")
+			elseif ContainsSpecialText then
+				draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) - tw, ScrH() - fontheight * (1 + LineOffset) - ScreenScaleH(10) - ScreenScaleH(1), ButtonsTable[ButtonOrder][2][i], "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
+				tw = tw + surface.GetTextSize(ButtonsTable[ButtonOrder][2][i]) + ScreenScaleH(2) * 2
+			else
+				draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) - tw, ScrH() - fontheight * (1 + LineOffset) - ScreenScaleH(10) - ScreenScaleH(2), ButtonsTable[ButtonOrder][2][i], "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
+				tw = tw + surface.GetTextSize(ButtonsTable[ButtonOrder][2][i]) + ScreenScaleH(2) * 2
+			end
+		end
 
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight, string.upper(GetValidKey("+jump")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+jump"))))
-		draw.DrawText("Jump Off ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-	end
-
-	if IsValid(ply:GetBalanceEntity()) then
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - fontheight * 2 - ScreenScaleH(10) - ScreenScaleH(2), string.upper(GetValidKey("+moveright")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+moveright")))) + ScreenScaleH(4)
-		draw.DrawText("/", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight * 2, text_color, 	TEXT_ALIGN_RIGHT)
-		tw = tw + select(1, surface.GetTextSize("/"))
-		draw.WordBox(ScreenScaleH(2), ScrW() - tw - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 2, string.upper(GetValidKey("+moveleft")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = tw + select(1, surface.GetTextSize(string.upper(GetValidKey("+moveleft"))))
-		draw.DrawText("Balance ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 2 - ScreenScaleH(10), 	text_color, TEXT_ALIGN_RIGHT)
-
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight, string.upper(GetValidKey("+attack2")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+attack2"))))
-		draw.DrawText("Turn Around ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight * 3, string.upper(GetValidKey("+forward")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+forward"))))
-		draw.DrawText("Move Forward ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight * 3 - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
-	end
-
-	if IsValid(ply:GetZipline()) then
-		draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10), ScrH() - ScreenScaleH(10) - ScreenScaleH(2) - fontheight, string.upper(GetValidKey("+duck")), "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
-		tw = select(1, surface.GetTextSize(string.upper(GetValidKey("+duck"))))
-		draw.DrawText("Drop ", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - fontheight - ScreenScaleH(10), text_color, TEXT_ALIGN_RIGHT)
+		draw.DrawText(ButtonsTable[ButtonOrder][1], "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(4), ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
 	end
 end)
