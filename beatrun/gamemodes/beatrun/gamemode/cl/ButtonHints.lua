@@ -173,10 +173,10 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 				draw.DrawText("+", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
 				tw = tw + surface.GetTextSize("+")
 			elseif ContainsSpecialText then
-				draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) * 2 - tw, ScrH() - fontheight * (1 + LineOffset) - ScreenScaleH(1), ButtonsTable[ButtonOrder][2][i], "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
+				draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) - tw, ScrH() - fontheight * (1 + LineOffset) - ScreenScaleH(10) - ScreenScaleH(1), ButtonsTable[ButtonOrder][2][i], "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
 				tw = tw + surface.GetTextSize(ButtonsTable[ButtonOrder][2][i]) + ScreenScaleH(2) * 2
 			else
-				draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) * 2 - tw, ScrH() - fontheight * (1 + LineOffset) - ScreenScaleH(2), ButtonsTable[ButtonOrder][2][i], "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
+				draw.WordBox(ScreenScaleH(2), ScrW() - ScreenScaleH(10) - tw, ScrH() - fontheight * (1 + LineOffset) - ScreenScaleH(10) - ScreenScaleH(2), ButtonsTable[ButtonOrder][2][i], "BeatrunButtons", box_color, text_color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
 				tw = tw + surface.GetTextSize(ButtonsTable[ButtonOrder][2][i]) + ScreenScaleH(2) * 2
 			end
 		end
