@@ -134,7 +134,7 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 		if ((fraction or 1) <= 0.35) then
 			ButtonsTable[#ButtonsTable + 1] = {"Climb Up", {GetFormattedKey("+forward"), "HELDPRESS"}}
 		else
-			ButtonsTable[#ButtonsTable + 1] = {"Jump", {GetFormattedKey("+jump")}}
+			ButtonsTable[#ButtonsTable + 1] = {"Jump", {GetFormattedKey("+forward"), "AND", GetFormattedKey("+jump")}}
 		end
 
 		ButtonsTable[#ButtonsTable + 1] = {"Slide Down", {GetFormattedKey("+back"), "HELDPRESS"}}
