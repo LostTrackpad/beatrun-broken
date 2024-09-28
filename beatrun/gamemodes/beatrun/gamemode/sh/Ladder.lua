@@ -18,7 +18,6 @@ local function LadderCheck(ply, mv, cmd, ladder)
 	local ladderang = ladder:GetAngles()
 
 	if math.abs(math.AngleDifference(cmd:GetViewAngles().y, ladderang.y - 180)) > 30 then
-		print("kill me already")
 		return false
 	end
 
