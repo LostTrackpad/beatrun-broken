@@ -274,7 +274,7 @@ local function LadderThink(ply, mv, cmd, ladder)
 		newpos[facing.pos] = mv:GetOrigin()[facing.pos] + facing.num
 
 		vel = vector_origin
-		vel = vel + forward * (6 / 0.06858125)
+		vel = vel + forward * (12 / 0.06858125)
 		--print("--")
 		--print(vel)
 		vel.z = 300
