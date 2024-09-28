@@ -72,66 +72,66 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 	local ButtonsTable = {} -- initialize/clear button table
 
 	surface.SetFont("BeatrunButtons")
-	fontheight = select(2, surface.GetTextSize("Test String")) * 1.5
+	fontheight = select(2, surface.GetTextSize("Placeholder, do not localize")) * 1.5
 
 	if Course_Name != "" and RestartAtCheckpoint and ply:GetNW2Int("CPNum", -1) > 1 then
-		ButtonsTable[#ButtonsTable + 1] = {"Restart From Checkpoint", {GetFormattedKey("+reload")}}
-		ButtonsTable[#ButtonsTable + 1] = {"Restart Course", {GetFormattedKey("+reload"), "HELDPRESS"}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.ttcheckpoint"), {GetFormattedKey("+reload")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.ttrestart"), {GetFormattedKey("+reload"), "HELDPRESS"}}
 	elseif Course_Name != "" then
-		ButtonsTable[#ButtonsTable + 1] = {"Restart Course", {GetFormattedKey("+reload")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.ttrestart"), {GetFormattedKey("+reload")}}
 	end
 
 	if ply:OnGround() and ply:UsingRH() and !QuickturnSpecialCase then
-		ButtonsTable[#ButtonsTable + 1] = {"Quickstep", {GetFormattedKey("+attack2"), "AND", GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.sidestep"), {GetFormattedKey("+attack2"), "AND", GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
 	end
 
 	if (!ply:OnGround() or QuickturnGround) and (ply:UsingRH() or (ply:notUsingRH() and !QuickturnHandsOnly)) and not QuickturnSpecialCase then
-		ButtonsTable[#ButtonsTable + 1] = {"Quickturn", {GetFormattedKey("+attack2")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.quickturn"), {GetFormattedKey("+attack2")}}
 	end
 
 	if !ply:OnGround() and ply:UsingRH() and not QuickturnSpecialCase then
 		if !ply:GetDive() then
-			ButtonsTable[#ButtonsTable + 1] = {"Dive", {GetFormattedKey("+duck"), "AND", GetFormattedKey("+attack2")}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.dive"), {GetFormattedKey("+duck"), "AND", GetFormattedKey("+attack2")}}
 		end
 
 		if !ply:GetCrouchJump() then
-			ButtonsTable[#ButtonsTable + 1] = {"Coil", {GetFormattedKey("+duck")}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.crouchjump"), {GetFormattedKey("+duck")}}
 		end
 	end
 
 	if !ply:OnGround() and !ply:GetCrouchJump() and !ply:GetDive() then
 		if ply:GetVelocity():Length2D() > 220 and ply:GetVelocity().z <= -350 and !QuickturnSpecialCase then
-			ButtonsTable[#ButtonsTable + 1] = {"Safety Roll", {GetFormattedKey("+duck"), "TIMEDPRESS"}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.fasthorfall"), {GetFormattedKey("+duck"), "TIMEDPRESS"}}
 		elseif ply:GetVelocity().z <= -350 and !QuickturnSpecialCase then
-			ButtonsTable[#ButtonsTable + 1] = {"Safe Landing", {GetFormattedKey("+duck"), "TIMEDPRESS"}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.slowhorfall"), {GetFormattedKey("+duck"), "TIMEDPRESS"}}
 		end
 	end
 
 	if ply:GetMantle() == 2 then
-		ButtonsTable[#ButtonsTable + 1] = {"Springboard", {GetFormattedKey("+jump"), "HELDPRESS"}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.vaultjump"), {GetFormattedKey("+jump"), "HELDPRESS"}}
 	end
 
 	if ply:GetClimbing() != 0 then
 		local ang = EyeAngles()
 		ang = math.abs(math.AngleDifference(ang.y, ply.wallang.y))
 
-		ButtonsTable[#ButtonsTable + 1] = {"Move", {GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
-		ButtonsTable[#ButtonsTable + 1] = {"Drop", {GetFormattedKey("+duck")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.move"), {GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.drop"), {GetFormattedKey("+duck")}}
 		if ang <= 42 then
-			ButtonsTable[#ButtonsTable + 1] = {"Climb Up", {GetFormattedKey("+forward")}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.climb"), {GetFormattedKey("+forward")}}
 		else
-			ButtonsTable[#ButtonsTable + 1] = {"Jump Off", {GetFormattedKey("+jump"), "AND", GetFormattedKey("+forward")}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.jump"), {GetFormattedKey("+jump"), "AND", GetFormattedKey("+forward")}}
 		end
 	end
 
 	if ply:GetWallrun() == 1 then
-		ButtonsTable[#ButtonsTable + 1] = {"Quickturn", {GetFormattedKey("+attack2")}}
-		ButtonsTable[#ButtonsTable + 1] = {"Cancel Wallclimb", {GetFormattedKey("+duck")}}
-		ButtonsTable[#ButtonsTable + 1] = {"Side Jump", {GetFormattedKey("+jump"), "AND", GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.quickturn"), {GetFormattedKey("+attack2")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.wallclimbcancel"), {GetFormattedKey("+duck")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.wallclimbsidejump"), {GetFormattedKey("+jump"), "AND", GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
 	elseif ply:GetWallrun() != 0 then
-		ButtonsTable[#ButtonsTable + 1] = {"Quickturn", {GetFormattedKey("+attack2")}}
-		ButtonsTable[#ButtonsTable + 1] = {"Cancel Wallclimb", {GetFormattedKey("+duck")}}
-		ButtonsTable[#ButtonsTable + 1] = {"Jump", {GetFormattedKey("+jump")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.quickturn"), {GetFormattedKey("+attack2")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.wallclimbcancel"), {GetFormattedKey("+duck")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.jump"), {GetFormattedKey("+jump")}}
 	end
 
 	if IsValid(ply:GetLadder()) then
@@ -144,23 +144,23 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 		local fraction = ply.LadderTraceOut.Fraction
 
 		if ((fraction or 1) <= 0.35) then
-			ButtonsTable[#ButtonsTable + 1] = {"Climb Up", {GetFormattedKey("+forward"), "HELDPRESS"}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.climb"), {GetFormattedKey("+forward"), "HELDPRESS"}}
 		else
-			ButtonsTable[#ButtonsTable + 1] = {"Jump", {GetFormattedKey("+forward"), "AND", GetFormattedKey("+jump")}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.jump"), {GetFormattedKey("+forward"), "AND", GetFormattedKey("+jump")}}
 		end
 
-		ButtonsTable[#ButtonsTable + 1] = {"Slide Down", {GetFormattedKey("+back"), "HELDPRESS"}}
-		ButtonsTable[#ButtonsTable + 1] = {"Drop", {GetFormattedKey("+duck")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.ladderdescend"), {GetFormattedKey("+back"), "HELDPRESS"}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.drop"), {GetFormattedKey("+duck")}}
 	elseif IsValid(ply:GetBalanceEntity()) then
-		ButtonsTable[#ButtonsTable + 1] = {"Balance", {GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
-		ButtonsTable[#ButtonsTable + 1] = {"Turn Around", {GetFormattedKey("+attack2")}}
-		ButtonsTable[#ButtonsTable + 1] = {"Move Forward", {GetFormattedKey("+forward")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.balance"), {GetFormattedKey("+moveright"), "OR", GetFormattedKey("+moveleft")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.balanceturn"), {GetFormattedKey("+attack2")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.balanceforward"), {GetFormattedKey("+forward")}}
 	elseif IsValid(ply:GetZipline()) then
-		ButtonsTable[#ButtonsTable + 1] = {"Drop", {GetFormattedKey("+duck")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.drop"), {GetFormattedKey("+duck")}}
 	elseif ply:GetGrappling() then
-		ButtonsTable[#ButtonsTable + 1] = {"Jump", {GetFormattedKey("+jump")}}
-		ButtonsTable[#ButtonsTable + 1] = {"Extend Grapple", {GetFormattedKey("+attack2")}}
-		ButtonsTable[#ButtonsTable + 1] = {"Shorten Grapple", {GetFormattedKey("+attack")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.jump"), {GetFormattedKey("+jump")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.grapplelonger"), {GetFormattedKey("+attack2")}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.grappleshorter"), {GetFormattedKey("+attack")}}
 	end
 
 	for i=1,#ButtonsTable do
@@ -171,12 +171,12 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 		tw = 0
 		for i=1,#ButtonsTable[ButtonOrder][2] do
 			if ButtonsTable[ButtonOrder][2][i] == "TIMEDPRESS" then
-				draw.DrawText("(Timed)", "BeatrunButtonsSmall", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(2), ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
-				tw = tw + surface.GetTextSize("(Timed)")
+				draw.DrawText(language.GetPhrase("beatrun.buttonhints.timed"), "BeatrunButtonsSmall", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(2), ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
+				tw = tw + surface.GetTextSize(language.GetPhrase("beatrun.buttonhints.timed"))
 				ContainsSpecialText = true
 			elseif ButtonsTable[ButtonOrder][2][i] == "HELDPRESS" then
-				draw.DrawText("(Hold)", "BeatrunButtonsSmall", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(2), ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
-				tw = tw + surface.GetTextSize("(Hold)")
+				draw.DrawText(language.GetPhrase("beatrun.buttonhints.hold"), "BeatrunButtonsSmall", ScrW() - ScreenScaleH(10) - tw - ScreenScaleH(2), ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
+				tw = tw + surface.GetTextSize(language.GetPhrase("beatrun.buttonhints.hold"))
 				ContainsSpecialText = true
 			elseif ButtonsTable[ButtonOrder][2][i] == "OR" then
 				draw.DrawText("/", "BeatrunButtons", ScrW() - ScreenScaleH(10) - tw, ScrH() - ScreenScaleH(10) - fontheight * (1 + LineOffset), text_color, TEXT_ALIGN_RIGHT)
