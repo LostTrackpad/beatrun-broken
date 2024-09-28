@@ -91,7 +91,7 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 
 	if !ply:OnGround() and ply:UsingRH() and not QuickturnSpecialCase then
 		if !ply:GetDive() then
-			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.dive"), {GetFormattedKey("+attack2"), "AND", GetFormattedKey("+ducl")}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.dive"), {GetFormattedKey("+attack2"), "AND", GetFormattedKey("+duck")}}
 		end
 
 		if !ply:GetCrouchJump() then
