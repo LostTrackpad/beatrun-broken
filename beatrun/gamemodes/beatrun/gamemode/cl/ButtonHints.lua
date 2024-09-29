@@ -76,7 +76,7 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 
 	if Course_Name != "" and RestartAtCheckpoint and ply:GetNW2Int("CPNum", -1) > 1 then
 		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.ttcheckpoint"), {GetFormattedKey("+reload")}}
-		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.ttrestart"), {GetFormattedKey("+reload"), "HELDPRESS"}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.ttrestart"), {"HELDPRESS", GetFormattedKey("+reload")}}
 	elseif Course_Name != "" then
 		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.ttrestart"), {GetFormattedKey("+reload")}}
 	end
@@ -91,7 +91,7 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 
 	if !ply:OnGround() and ply:UsingRH() and not QuickturnSpecialCase then
 		if !ply:GetDive() then
-			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.dive"), {GetFormattedKey("+attack2"), "AND", GetFormattedKey("+duck")}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.dive"), {GetFormattedKey("+duck"), "AND", GetFormattedKey("+attack2")}}
 		end
 
 		if !ply:GetCrouchJump() then
@@ -101,9 +101,9 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 
 	if !ply:OnGround() and !ply:GetCrouchJump() and !ply:GetDive() then
 		if ply:GetVelocity():Length2D() > 220 and ply:GetVelocity().z <= -350 and !QuickturnSpecialCase then
-			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.fasthorfall"), {GetFormattedKey("+duck"), "TIMEDPRESS"}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.fasthorfall"), {"TIMEDPRESS", GetFormattedKey("+duck")}}
 		elseif ply:GetVelocity().z <= -350 and !QuickturnSpecialCase then
-			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.slowhorfall"), {GetFormattedKey("+duck"), "TIMEDPRESS"}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.slowhorfall"), {"TIMEDPRESS", GetFormattedKey("+duck")}}
 		end
 	end
 
@@ -144,12 +144,12 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 		local fraction = ply.LadderTraceOut.Fraction
 
 		if ((fraction or 1) <= 0.35) then
-			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.climb"), {GetFormattedKey("+forward"), "HELDPRESS"}}
+			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.climb"), {"HELDPRESS", GetFormattedKey("+forward")}}
 		else
 			ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.jump"), {GetFormattedKey("+jump"), "AND", GetFormattedKey("+forward")}}
 		end
 
-		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.ladderdescend"), {GetFormattedKey("+back"), "HELDPRESS"}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.ladderdescend"), {"HELDPRESS", GetFormattedKey("+back")}}
 		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.drop"), {GetFormattedKey("+duck")}}
 	elseif IsValid(ply:GetBalanceEntity()) then
 		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.balance"), {GetFormattedKey("+moveleft"), "OR", GetFormattedKey("+moveright")}}
