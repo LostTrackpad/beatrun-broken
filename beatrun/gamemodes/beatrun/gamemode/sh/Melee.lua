@@ -1,6 +1,8 @@
 local kickglitch = CreateConVar("Beatrun_KickGlitch", "1", {FCVAR_REPLICATED, FCVAR_ARCHIVE})
 local old_kickglitch = CreateConVar("Beatrun_OldKickGlitch", "0", {FCVAR_REPLICATED, FCVAR_ARCHIVE})
 
+local vecdir = Vector(1000, 1000, 1000)
+
 local tr = {}
 local tr_result = {}
 MELEE_WRRIGHT = 6
@@ -277,6 +279,9 @@ hook.Add("SetupMove", "Melee", function(ply, mv, cmd)
 			vel.z = 300
 
 			mv:SetVelocity(vel)
+
+			ply:SetWallrunDir(vecdir)
+			ply:SetWallrunCount(0)
 		elseif kickglitch:GetBool() and not old_kickglitch:GetBool() then
 			if SERVER then
 				local oldfriction = ply:GetFriction()
@@ -304,6 +309,9 @@ hook.Add("SetupMove", "Melee", function(ply, mv, cmd)
 				end)
 			end
 
+			--ply:SetWallrunDir(vecdir)
+			--ply:SetWallrunCount(0)
+
 			ParkourEvent("jumpslow", ply)
 		end
 	end
@@ -330,17 +338,13 @@ hook.Add("Move", "KickglitchApply", function(ply,mv,cmd)
 			forward.p = 0
 			forward = forward:Forward()
 			local speedboost = forward * (4 / 0.06858125)
-			--print(speedboost)
-
-			--print("--")
-
-			--print(mv:GetVelocity())
 			local vel = mv:GetVelocity()
 			vel = vel + speedboost
-			--print("--")
-			--print(vel)
 			vel.z = 300
 			mv:SetVelocity(vel)
+
+			ply:SetWallrunDir(vecdir)
+			ply:SetWallrunCount(0)
 		end
 		ply:SetNWBool("KickglitchWindowActive", false)
 	end
