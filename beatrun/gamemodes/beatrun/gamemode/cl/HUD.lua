@@ -3,6 +3,7 @@ local sway = CreateClientConVar("Beatrun_HUDSway", "1", true, false, language.Ge
 local dynamic = CreateClientConVar("Beatrun_HUDDynamic", "0", true, false, language.GetPhrase("beatrun.convars.huddynamic"), 0, 1)
 local hidden = CreateClientConVar("Beatrun_HUDHidden", "0", true, false, language.GetPhrase("beatrun.convars.hudhidden"), 0, 2)
 local verificationstats = CreateClientConVar("Beatrun_HUDVerification", "0", true, false, "", 0, 1)
+local minify = CreateClientConVar("Beatrun_HUDMinify", "0", true, false, "", 0, 1)
 -- local reticle = CreateClientConVar("Beatrun_HUDReticle", "1", true, false, language.GetPhrase("beatrun.convars.hudreticle"), 0, 1)
 
 CreateClientConVar("Beatrun_HUDTextColor", "255 255 255 255", true, true, language.GetPhrase("beatrun.convars.hudtextcolor"))
@@ -290,6 +291,175 @@ local function BeatrunHUD()
 	surface.DrawText(coursename)
 end
 
+local function MinifiedBeatrunHUD()
+	local ply = LocalPlayer()
+	local scrw = ScrW()
+	local scrh = ScrH()
+
+	surface.SetFont("DebugFixedSmall")
+
+	local version_text = "v" .. VERSIONGLOBAL
+	local tw, _ = surface.GetTextSize(version_text)
+	surface.SetTextColor(255, 255, 255, 20)
+	surface.SetTextPos(scrw - tw, 0)
+	surface.DrawText(version_text)
+	surface.SetFont("BeatrunHUD")
+
+	if VERSIONGLOBAL ~= VERSIONLATEST then
+		local update_text = "Update available!"
+		local notlatest_w, _ = surface.GetTextSize(update_text)
+		surface.SetTextColor(255, 255, 255, 30)
+		surface.SetTextPos(scrw - notlatest_w, 10)
+		surface.DrawText(update_text)
+		surface.SetFont("BeatrunHUD")
+	end
+
+	local pl = ply:GetNW2Int("PLoss")
+	local CT = CurTime()
+
+	if pl > 10 or CT < lastloss then
+		local alpha = math.Clamp(math.abs(math.sin(CurTime() * 4) * 255), 25, 255)
+
+		surface.SetDrawColor(255, 255, 255, alpha)
+		surface.SetMaterial(packetloss)
+		surface.DrawTexturedRect(5, 5, 58.75, 41.75)
+		surface.SetTextPos(65, 20)
+		surface.SetTextColor(255, 195, 90, alpha)
+		surface.DrawText(pl)
+
+		if pl > 10 then
+			lastloss = CT + 4
+		end
+	end
+
+	if BuildMode then return end
+	if hidden:GetInt() > 1 then return end
+
+	local shoulddraw = hook.Run("BeatrunDrawHUD")
+
+	if shoulddraw == false then return end
+
+	local vp = ply:GetViewPunchAngles()
+
+	if not sway:GetBool() then
+		vp.x = 0
+		vp.z = 0
+	end
+
+	local coursename = nil
+	local customname = hook.Run("BeatrunHUDCourse")
+	coursename = customname and customname or Course_Name ~= "" and language.GetPhrase("beatrun.hud.course"):format(Course_Name) or "#beatrun.hud.freeplay"
+	-- local lastxp = ply.LastXP or 0
+	local nicktext = nil
+
+	nicktext = ply:Nick() .. " | Lv. ".. ply:GetLevel()
+	
+	if show_total_xp:GetBool() then nicktext = nicktext .. " (" .. ply:GetXP() .. "XP)" end
+
+	surface.SetFont("BeatrunHUDSmall")
+	--surface.SetFont("BeatrunHUD")
+
+	local nickw, nickh = surface.GetTextSize(nicktext)
+
+	local coursew, _ = surface.GetTextSize(coursename)
+	local bgpadw = nickw
+	-- local bgpadh = nickh
+
+	if bgpadw < coursew then
+		bgpadw = coursew
+	end
+
+	local bgpadding = bgpadw > 200 and bgpadw + 15 or 200
+
+	if dynamic:GetBool() then
+		hidealpha = math.Approach(hidealpha, 150 * ply:GetVelocity():Length() / 250, 200 * RealFrameTime())
+	else
+		hidealpha = 0
+	end
+	if not hidden:GetBool() then
+		local corner_color_c = string.ToColor(ply:GetInfo("Beatrun_HUDCornerColor"))
+		corner_color_c.a = math.Clamp(corner_color_c.a + 50, 0, 255)
+		corner_color_c.a = dynamic:GetBool() and math.max(150 - hidealpha, 50) or corner_color_c.a
+
+		surface.SetDrawColor(corner_color_c)
+		surface.DrawRect(-20 + vp.z, scrh * 0.915 + vp.x, 40, SScaleY(62))
+
+		DrawBlurRect(20 + vp.z, scrh * 0.915 + vp.x, SScaleX(bgpadding), SScaleY(62), math.max(255 - hidealpha, 2))
+
+		local corner_color = string.ToColor(ply:GetInfo("Beatrun_HUDCornerColor"))
+		corner_color.a = dynamic:GetBool() and math.max(100 - hidealpha, 2) or corner_color.a
+
+		local text_color = string.ToColor(ply:GetInfo("Beatrun_HUDTextColor"))
+		text_color.a = dynamic:GetBool() and math.max(255 - hidealpha, 2) or text_color.a
+
+		surface.SetDrawColor(corner_color)
+		surface.DrawOutlinedRect(20 + vp.z, scrh * 0.915 + vp.x, SScaleX(bgpadding), SScaleY(62))
+		--surface.SetFont("BeatrunHUD")
+		surface.SetTextColor(text_color)
+
+		if verificationstats:GetBool() then
+			surface.SetTextPos(scrw * 0.015 + vp.z, scrh * 0.02 + vp.x)
+			surface.DrawText("Purist: ")
+			surface.DrawText(ply:GetInfo("Beatrun_PuristMode") == "1" and "true" or "false")
+			surface.SetTextPos(scrw * 0.015 + vp.z, scrh * 0.04 + vp.x)
+			surface.DrawText("Purist Wallrun: ")
+			surface.DrawText(ply:GetInfo("Beatrun_PuristWallrun") == "1" and "true" or "false")
+			surface.SetTextPos(scrw * 0.015 + vp.z, scrh * 0.06 + vp.x)
+			surface.DrawText("Kick Glitch: ")
+			surface.DrawText(ply:GetInfo("Beatrun_OldKickGlitch") == "1" and "Old" or "New")
+		end
+
+		if tobool(ply:GetInfo("Beatrun_PuristMode")) or GetConVar("Beatrun_PuristModeForce"):GetBool() then
+			surface.SetDrawColor(230, 230, 230)
+			surface.SetMaterial(MELogo)
+			surface.DrawTexturedRect(scrw * 0.00125 + vp.z, scrh * 0.916 + vp.x + SScaleY(16) * 0.25, SScaleX(16), SScaleY(16))
+		else
+			surface.SetFont("BeatrunHUD")
+			surface.SetTextPos(scrw * 0.002 + vp.z, scrh * 0.916 + vp.x)
+			surface.DrawText("★")
+		end
+
+		if GetConVar("Beatrun_PuristModeForce"):GetBool() then
+			surface.SetTextColor(230,230,230)
+			surface.SetTextPos(scrw * 0.002 + vp.z, scrh * 0.94 + vp.x)
+			surface.DrawText("F")
+		end
+
+		surface.SetTextColor(text_color)
+		surface.SetFont("BeatrunHUDSmall")
+		surface.SetTextPos(scrw * 0.015 + vp.z, scrh * 0.92 + vp.x)
+		surface.DrawText(nicktext)
+		surface.SetDrawColor(25, 25, 25, math.max(255 - hidealpha, 2))
+		surface.DrawRect(scrw * 0.015 + vp.z, scrh * 0.94 + 1 + vp.x, SScaleX(150), SScaleY(4))
+		surface.SetDrawColor(text_color.r, text_color.g, text_color.b, math.max(255 - hidealpha, 2))
+		surface.DrawRect(scrw * 0.015 + vp.z, scrh * 0.94 + vp.x, SScaleX(150 * math.min(ply:GetLevelRatio(), 1)), SScaleY(5))
+
+		for k, v in pairs(XP_floatingxp) do
+			local floating_color = string.ToColor(ply:GetInfo("Beatrun_HUDFloatingXPColor"))
+			floating_color.a = math.Clamp(1000 * math.abs(CurTime() - k) / 5 - hidealpha, 0, 255)
+
+			surface.SetFont("BeatrunHUD")
+			surface.SetTextColor(floating_color)
+			surface.SetTextPos(scrw * 0.015 + vp.z + nickw + 3, scrh * 0.92 + vp.x + nickh - 42 + 50 * math.abs(CurTime() - k) / 5)
+			surface.DrawText(v)
+
+			if k < CurTime() then
+				XP_floatingxp[k] = nil
+			end
+		end
+	end
+
+	local text_color_c = string.ToColor(ply:GetInfo("Beatrun_HUDTextColor"))
+	text_color_c.a = text_color_c.a - 55
+	text_color_c.a = dynamic:GetBool() and math.max(200 - hidealpha, 2) or text_color_c.a
+
+	surface.SetFont("BeatrunHUDSmall")
+	surface.SetTextColor(text_color_c)
+	surface.SetTextPos(scrw * 0.015 + vp.z, scrh * 0.95 + vp.x)
+	surface.DrawText(coursename)
+end
+
+
 local allply = nil
 local allplytimer = 0
 local niltime = "--:--:--"
@@ -432,7 +602,11 @@ function BeatrunLeaderboard(forced)
 	end
 end
 
-hook.Add("HUDPaint", "BeatrunHUD", BeatrunHUD)
+hook.Add("HUDPaint", "BeatrunHUD", function()
+	if minify:GetBool() then MinifiedBeatrunHUD()
+	else BeatrunHUD()
+	end
+end)
 hook.Add("HUDPaint", "BeatrunLeaderboard", BeatrunLeaderboard)
 
 local lastchatply = nil
