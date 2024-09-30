@@ -108,7 +108,7 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 	end
 
 	if ply:GetMantle() == 2 then
-		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.vaultjump"), {GetFormattedKey("+jump"), "HELDPRESS"}}
+		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.vaultjump"), {"HELDPRESS", GetFormattedKey("+jump")}}
 	end
 
 	if ply:GetClimbing() != 0 then
