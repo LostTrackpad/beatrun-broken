@@ -44,9 +44,9 @@ hook.Add("RenderScreenspaceEffects", "funnybrdof", function()
 	local dist = tr.HitPos:Distance(ply:GetPos())
 
     if ply:GetSliding() or ply:GetClimbing() != 0 or ply:GetWallrun() == 1 or IsValid(ply:GetLadder()) then
-		BOKEN_FORCE = math.Clamp(BOKEN_FORCE + 0.03 * (FrameTime() * 66), 0,1)
+		BOKEN_FORCE = math.Clamp(BOKEN_FORCE + 0.03 * (FrameTime() * 66), 0,2)
     else
-    	BOKEN_FORCE = math.Clamp(BOKEN_FORCE - 0.03 * (FrameTime() * 66), 0,1)
+    	BOKEN_FORCE = math.Clamp(BOKEN_FORCE - 0.03 * (FrameTime() * 66), 0,2)
     end
    
     blur_mat:SetTexture("$BASETEXTURE", render.GetScreenEffectTexture(1))
