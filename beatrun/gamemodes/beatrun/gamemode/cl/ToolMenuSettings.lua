@@ -7,7 +7,7 @@ end
 hook.Add("AddToolMenuCategories", "Beatrun_Category", function()
 	spawnmenu.AddToolCategory("Beatrun", "Client", language.GetPhrase("beatrun.toolsmenu.client"))
 	spawnmenu.AddToolCategory("Beatrun", "Server", language.GetPhrase("beatrun.toolsmenu.server"))
-	spawnmenu.AddToolCategory("Beatrun", "Extra", language.GetPhrase("beatrun.toolsmenu.extra"))
+	spawnmenu.AddToolCategory("Beatrun", "Extra", "Extras") --My stuff
 end)
 
 hook.Add("PopulateToolMenu", "Beatrun_ToolMenu", function()
@@ -154,6 +154,9 @@ hook.Add("PopulateToolMenu", "Beatrun_ToolMenu", function()
 
 		panel:CheckBox("HUD: Button Hints", "Beatrun_HUDButtonHints")
 		panel:ControlHelp("Show button hints on the bottom right of your display.")
+
+		panel:CheckBox("Use Minified HUD", "Beatrun_HUDMinify")
+		panel:ControlHelp("Use a redesigned, smaller HUD instead of the standard one.")
 
 		panel:CheckBox("#beatrun.toolsmenu.hud.dynamic", "Beatrun_HUDDynamic")
 		panel:ControlHelp("#beatrun.toolsmenu.hud.dynamicdesc")
@@ -417,6 +420,27 @@ hook.Add("PopulateToolMenu", "Beatrun_ToolMenu", function()
 		-- end
 		-- panel:AddItem(LoadoutMenuButton)
 	end)
+	--My Stuff
+	spawnmenu.AddToolMenuOption("Beatrun", "Extra", "beatrun_addib", "addib", "", "", function(panel)
+		panel:ClearControls()
+		panel:SetName("addiboy's wacky and amazing mod menu thingy!")
+		
+		panel:CheckBox("Sweaty stats", "Beatrun_HUDStats")
+		panel:ControlHelp("Extra stats to provide more info to help on harder tricks")
+		
+		panel:CheckBox("Show Angle | Left", "Beatrun_HUDExtra")
+		panel:ControlHelp("Show Angle info on left side")
+		
+		panel:CheckBox("Speedrun Verification", "Beatrun_HUDVerification")
+		panel:ControlHelp("This is just for speedrun verification stuff lmaooo")
+		
+		panel:CheckBox("Fancy Speed Verification", "Beatrun_HUDFancy")
+		panel:ControlHelp("This is the fancier speedrun verification stuff. \nONLY USE IF YOU ARE RECORDING AT HIGH RESOLUTIONS!")
+		
+		--panel:CheckBox("Bhop Toggle", "Beatrun_Bhop")
+		--panel:ControlHelp("Enables Bhop")
+		
+	end)
 
 	spawnmenu.AddToolMenuOption("Beatrun", "Server", "beatrun_serverfun", "Fun", "", "", function(panel)
 		local funoptions = vgui.Create("DForm")
@@ -438,16 +462,5 @@ hook.Add("PopulateToolMenu", "Beatrun_ToolMenu", function()
 		experimentals:SetName("Experimental Things™")
 		experimentals:CheckBox("\"Slippy Wallruns\"", "Beatrun_Experimentals_SlippyWallrun")
 		experimentals:ControlHelp("You randomly drop from wallruns with a different weapon out. Requires Cruelty Parkour to be ON.")
-	end)
-
-	spawnmenu.AddToolMenuOption("Beatrun", "Extra", "beatrun_extra", "#beatrun.toolsmenu.extra.name", "", "", function(panel)
-		panel:ClearControls()
-		panel:SetName("#beatrun.toolsmenu.extra.desc")
-
-		panel:CheckBox("#beatrun.toolsmenu.extra.stats", "Beatrun_HUDStats")
-		panel:ControlHelp("#beatrun.toolsmenu.extra.statsdesc")
-
-		panel:CheckBox("#beatrun.toolsmenu.extra.speedrunsverif", "Beatrun_HUDVerification")
-		panel:ControlHelp("#beatrun.toolsmenu.extra.speedrunsverifdesc")
 	end)
 end)
