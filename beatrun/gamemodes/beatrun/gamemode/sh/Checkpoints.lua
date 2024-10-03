@@ -309,12 +309,31 @@ function CourseHUD()
 	end
 
 	if incourse and !ply.InReplay then
+		cpcount = ply:GetNW2Int("CPNum", 1) - 1
+		if cpcount == -2 then cpcount = table.Count(Checkpoints) - 1 end
+
 		local text = string.FormattedTime(totaltime, "%02i:%02i:%02i")
 		local w, _ = surface.GetTextSize(text)
 		surface.SetFont("BeatrunHUD")
 		surface.SetTextColor(text_color)
 		surface.SetTextPos(ScrW() * 0.87 - w + vpx, ScrH() * 0.075 + vpz)
 		surface.DrawText(text)
+
+		text = "CHECKPOINT"
+		local w, _ = surface.GetTextSize(text)
+		surface.SetTextPos(ScrW() * 0.8 - w + vpx, ScrH() * 0.075 + vpz)
+		surface.DrawText(text)
+		if cpcount != -3 then
+			text = cpcount .. "/".. table.Count(Checkpoints) - 1 .. " PASSED"
+			local w, h = surface.GetTextSize(text)
+			surface.SetTextPos(ScrW() * 0.8 - w + vpx, ScrH() * 0.075 + h + vpz)
+			surface.DrawText(text)
+		else
+			text = "N/A PASSED"
+			local w, h = surface.GetTextSize(text)
+			surface.SetTextPos(ScrW() * 0.8 - w + vpx, ScrH() * 0.075 + h + vpz)
+			surface.DrawText(text)
+		end
 	end
 
 	if incourse and pbtimes and !ply.InReplay then
