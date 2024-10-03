@@ -115,6 +115,8 @@ hook.Add("EntityTakeDamage", "ShieldProtectPlayer", function(ent, dmg)
 	shieldper = ent:GetNWFloat("MomentumShieldPer", 0)
 	local dmgamount = dmg:GetDamage()
 
+	if dmg:GetDamageType() == DMG_FALL then return end
+
 	if shieldper > 0 and (shieldper - dmgamount) > 0 then
 		ent:SetNWFloat("MomentumShieldPer", math.Clamp(shieldper - dmgamount, 0, 300))
 		dmg:ScaleDamage(0)
