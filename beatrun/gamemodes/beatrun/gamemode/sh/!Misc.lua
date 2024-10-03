@@ -27,8 +27,8 @@ if CLIENT then
 end
 
 hook.Add("PlayerNoClip", "BlockNoClip", function(ply, enabled)
-	if enabled and Course_Name ~= "" and ply:GetNW2Int("CPNum", 1) ~= -1 then
-		ply:SetNW2Int("CPNum", -1)
+	if enabled and Course_Name ~= "" and ply:GetNW2Int("CPNum", 1) ~= -2 then
+		ply:SetNW2Int("CPNum", -2)
 
 		if CLIENT and IsFirstTimePredicted() then
 			notification.AddLegacy(language.GetPhrase("beatrun.misc.noclipdetected"), NOTIFY_ERROR, 4)
