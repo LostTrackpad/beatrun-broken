@@ -113,6 +113,7 @@ hook.Add("HUDPaint", "BeatrunButtonPrompts", function()
 
 	if ply:GetClimbing() != 0 then
 		local ang = EyeAngles()
+		ply.wallang = ply:GetClimbingAngle()
 		ang = math.abs(math.AngleDifference(ang.y, ply.wallang.y))
 
 		ButtonsTable[#ButtonsTable + 1] = {language.GetPhrase("beatrun.buttonhints.move"), {GetFormattedKey("+moveleft"), "OR", GetFormattedKey("+moveright")}}
