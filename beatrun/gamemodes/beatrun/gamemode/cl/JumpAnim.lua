@@ -1072,8 +1072,8 @@ local function BodyEventSounds(anim)
 end
 
 camint = 1
-campos = Vector()
-camang = Angle()
+viewpos = Vector()
+viewang = Angle()
 -- local customoffset = Vector()
 -- local movedback = false
 local customoffsetlerp = Vector()
@@ -1109,10 +1109,10 @@ local function JumpCalcView(view)
 	end
 
 	customoffsetlerp = LerpVector(math.min(10 * FrameTime(), 1), customoffsetlerp, customcamoffset[BodyAnimString] or defaultcamoffset)
-	campos = view.origin
-	camang = view.angles
+	viewpos = view.origin
+	viewang = view.angles
 
-	campos:Add(LocalToWorld(customoffsetlerp, angle_zero, vector_origin, BodyAnim:GetAngles()))
+	viewpos:Add(LocalToWorld(customoffsetlerp, angle_zero, vector_origin, BodyAnim:GetAngles()))
 
 	if IsValid(BodyAnim) and jumpanims[BodyAnimString] and BodyAnimCycle >= 1 then
 		BodyAnim:SetSequence(BodyAnim:LookupSequence("jumpidle"))
@@ -1194,7 +1194,7 @@ local function JumpArmDraw(a, b, c)
 
 		cam.IgnoreZ(true)
 
-		-- local camposoff = campos - ply:EyePos()
+		-- local viewposoff = viewpos - ply:EyePos()
 		local attachId = bac:LookupAttachment("eyes")
 		local offset = bac:GetAttachment(attachId)
 
@@ -1304,7 +1304,7 @@ local function JumpArmDraw(a, b, c)
 		end
 
 		if (not b or not skybox3d) and not worldarm[BodyAnimString] then
-			bac:SetRenderOrigin(campos)
+			bac:SetRenderOrigin(viewpos)
 
 			drawnorigin = true
 		end
@@ -1327,9 +1327,9 @@ hook.Add("CalcViewModelView", "lol", function(wep, vm, oldpos, oldang, pos, ang)
 	if has_tool_equipped then return end
 
 	pos:Sub(oldpos)
-	pos:Add(campos)
+	pos:Add(viewpos)
 	ang:Sub(oldang)
-	ang:Add(camang)
+	ang:Add(viewang)
 
 	if wep.m_ViewModel then
 		local vmoffsets = wep.ViewModelVars

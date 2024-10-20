@@ -342,7 +342,7 @@ function StartBodyAnim(animtable)
 		followplayer = true
 	end
 
-	hook.Add("CalcView", "BodyAnimCalcView2", BodyAnimCalcView2)
+	--hook.Add("CalcView", "BodyAnimCalcView2", BodyAnimCalcView2)
 	BodyAnimAngLerp = ply:EyeAngles()
 
 	if AnimString == nil or not ply:Alive() and not deathanim then return end
@@ -469,23 +469,23 @@ hook.Add("Think", "BodyAnimThink", function()
 	end
 end)
 
-local BodyAnimPosEase = Vector()
-local BodyAnimPosEaseLerp = 1
+BodyAnimPosEase = Vector()
+BodyAnimPosEaseLerp = 1
 
 function BodyAnimSetEase(pos)
 	BodyAnimPosEase:Set(pos)
 	BodyAnimPosEaseLerp = 0
 end
 
-local lastattachpos = Vector(0, 0, 0)
-local lastatt, savedatt = nil, nil
-local lerpchangeatt = 1
-local lastattdata = nil
-local lerpedpos = Vector()
-local lastlockang = false
-local lastlockangstart = Angle()
-local lasteyeang = Angle()
-local updatethirdperson = true
+lastattachpos = Vector(0, 0, 0)
+lastatt, savedatt = nil, nil
+lerpchangeatt = 1
+lastattdata = nil
+lerpedpos = Vector()
+lastlockang = false
+lastlockangstart = Angle()
+lasteyeang = Angle()
+updatethirdperson = true
 
 function BodyAnimCalcView2(ply, pos, angles, fov)
 	if ply:InVehicle() then
