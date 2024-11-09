@@ -1123,6 +1123,7 @@ local function CreateBodyAnimArmCopy()
 	if not IsValid(BodyAnimArmCopy) and IsValid(BodyAnim) and not ignorebac[BodyAnimString] then
 		local ply = LocalPlayer()
 		BodyAnimArmCopy = ClientsideModel("models/" .. BodyAnimMDLString .. ".mdl", RENDERGROUP_BOTH)
+		BodyAnimArmCopy:DrawShadow(false)
 		local seq = BodyAnim:GetSequence()
 
 		if seq then
@@ -1259,12 +1260,12 @@ local function JumpArmDraw(a, b, c)
 				cam.End3D()
 			else
 				local armoff = LocalToWorld(armoffset, angle_zero, vector_origin, BodyAnim:GetAngles())
-
+				
 				cam.IgnoreZ(ignorezarm[BodyAnimString] or false)
-				bac:SetAngles(BodyAnim:GetAngles())
-				bac:SetPos(BodyAnim:GetPos() + armoff)
+				bac:SetAngles(ang)
+				bac:SetPos(pos + armoff)
 				bac:SetRenderOrigin(nil)
-
+				
 				BodyAnimMDLarm:SetPos(BodyAnim:GetPos() + armoff)
 				bac:SetupBones()
 				BodyAnimMDLarm:DrawModel()

@@ -234,7 +234,7 @@ function CacheLerpBodyAnim()
 
 	if transition and transitionlerp < 1 then
 		BodyAnim:SetupBones()
-		BodyAnimMDL:SetNoDraw(true)
+		BodyAnimMDL:SetNoDraw(false)
 
 		local pos = LocalPlayer():GetPos()
 		local this = BodyAnim
@@ -248,28 +248,28 @@ function CacheLerpBodyAnim()
 				if not to[bone] then
 					to[bone] = {{}, {}, {}}
 				end
-
+			
 				local ModelBoneMatrix = BodyAnim:GetBoneMatrix(bone)
 				ModelBoneMatrix:SetTranslation(ModelBoneMatrix:GetTranslation())
-
+			
 				from[bone] = cachebody[bone]:FastToTable(from[bone]) or from[bone]
 				to[bone] = to[bone] or ModelBoneMatrix:FastToTable(to[bone])
-
+			
 				local bonematrix = this:GetBoneMatrix(bone)
 				bonematrix:SetTranslation(bonematrix:GetTranslation() - pos)
-
+			
 				to[bone] = bonematrix:FastToTable(to[bone])
-
+			
 				for i = 1, 3 do
 					local from = from[bone][i]
 					local v = to[bone][i]
-
+				
 					v[1] = LerpL(transitionlerp, from[1], v[1])
 					v[2] = LerpL(transitionlerp, from[2], v[2])
 					v[3] = LerpL(transitionlerp, from[3], v[3])
 					v[4] = LerpL(transitionlerp, from[4], v[4])
 				end
-
+			
 				if not this.m then
 					this.m = Matrix(to[bone])
 				else
@@ -278,10 +278,10 @@ function CacheLerpBodyAnim()
 					local bt2 = bt[2]
 					local bt3 = bt[3]
 					slot15 = bt[4]
-
+				
 					this.m:SetUnpacked(bt1[1], bt1[2], bt1[3], bt1[4], bt2[1], bt2[2], bt2[3], bt2[4], bt3[1], bt3[2], bt3[3], bt3[4], 0, 0, 0, 1)
 				end
-
+			
 				this.m:SetTranslation(this.m:GetTranslation() + pos)
 				this.m:SetScale(scalevec)
 				this:SetBoneMatrix(bone, this.m)
@@ -351,7 +351,7 @@ function StartBodyAnim(animtable)
 	BodyAnim = ClientsideModel("models/" .. tostring(animmodelstring) .. ".mdl", RENDERGROUP_BOTH)
 	BodyAnim:SetAngles(Angle(0, ply:EyeAngles().y, 0))
 	BodyAnim:SetPos(ply:GetPos())
-	BodyAnim:SetNoDraw(false)
+	BodyAnim:SetNoDraw(true)
 
 	if not IsValid(ply:GetHands()) then return end
 
@@ -368,6 +368,7 @@ function StartBodyAnim(animtable)
 
 		BodyAnimMDL:SnatchModelInstance(ply)
 		BodyAnimMDLarm = ClientsideModel(handsmodel, RENDERGROUP_BOTH)
+		BodyAnimMDLarm:DrawShadow(false)
 
 		function BodyAnimMDLarm.GetPlayerColor()
 			return LocalPlayer():GetPlayerColor()
@@ -744,11 +745,11 @@ hook.Add("PostDrawOpaqueRenderables", "IgnoreZBodyAnim", function(depth, sky)
 			cam.IgnoreZ(true)
 			BodyAnimMDL:DrawModel()
 			local customarmdraw = hook.Run("BodyAnimDrawArm")
-
+			
 			if not customarmdraw and IsValid(BodyAnimMDLarm) then
-				BodyAnimMDLarm:DrawModel()
+			BodyAnimMDLarm:DrawModel()
 			end
-
+		
 			cam.IgnoreZ(false)
 		end
 	end
