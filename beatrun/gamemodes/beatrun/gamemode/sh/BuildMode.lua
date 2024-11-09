@@ -1572,7 +1572,7 @@ if CLIENT then
 	end
 
 	function BuildModeCommand(ply, ucmd)
-		LocalPlayer():SetFOV(120)
+		--LocalPlayer():SetFOV(120)
 
 		if gui.IsGameUIVisible() then return end
 
@@ -1618,7 +1618,7 @@ if CLIENT then
 			hook.Add("HUDPaint", "BuildModeHUDPaint", BuildModeHUDPaint)
 
 			LocalPlayer():DrawViewModel(false)
-			LocalPlayer():SetFOV(120)
+			--LocalPlayer():SetFOV(120)
 
 			hook.Run("BuildModeState", true)
 		else

@@ -25,7 +25,7 @@ if SERVER then
 			ply.RegenTime = CurTime() + 5
 		end
 
-		if ply:Alive() and ply.RegenTime < CurTime() and ply:Health() < ply:GetMaxHealth() then
+		if ply:Alive() and (ply.RegenTime < CurTime() or ply:Health() > ply.LastHP) and ply:Health() < ply:GetMaxHealth() then
 			ply:SetHealth(math.Approach(ply:Health(), ply:GetMaxHealth(), 1))
 			ply.RegenTime = CurTime() + 0.05
 		end
@@ -39,24 +39,25 @@ if SERVER then
 
 	hook.Add("Move", "MomentumShieldRegen", function(ply, mv)
 		-- I use the move hook because I need momentum data...blame Garry
-		--if !momentumshield:GetBool() then return end
+		if momentumshield:GetBool() then
 
-		local shieldpercent = ply:GetNWFloat("MomentumShieldPer", 0)
+			local shieldpercent = ply:GetNWFloat("MomentumShieldPer", 0)
 
-		if !ply.shielddecaytime then
-			ply.shielddecaytime = 0
+			if !ply.shielddecaytime then
+				ply.shielddecaytime = 0
 
-			return
+				return
+			end
+
+			if ply:GetVelocity():Length2D() > (GetConVar("Beatrun_SpeedLimit"):GetInt() * 0.8181818181818182) then
+				ply:SetNWFloat("MomentumShieldPer", math.Approach(shieldpercent, 300, FrameTime() * 30))
+				ply.shielddecaytime = CurTime() + 3
+			elseif ply.shielddecaytime < CurTime() then
+				ply:SetNWFloat("MomentumShieldPer", math.Approach(shieldpercent, 0, FrameTime() * 250))
+			end
+
+			--print(shieldpercent)
 		end
-
-		if ply:GetVelocity():Length2D() > (GetConVar("Beatrun_SpeedLimit"):GetInt() * 0.8181818181818182) then
-			ply:SetNWFloat("MomentumShieldPer", math.Approach(shieldpercent, 300, FrameTime() * 30))
-			ply.shielddecaytime = CurTime() + 3
-		elseif ply.shielddecaytime < CurTime() then
-			ply:SetNWFloat("MomentumShieldPer", math.Approach(shieldpercent, 0, FrameTime() * 250))
-		end
-
-		--print(shieldpercent)
 	end)
 end
 
