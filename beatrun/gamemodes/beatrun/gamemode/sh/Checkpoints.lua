@@ -380,7 +380,33 @@ function CourseHUD()
 	end
 end
 
+function CheckpointOverlay()
+	if Course_Name == "" then return end
+	for _, v in ipairs(Checkpoints) do
+		if v:GetCPNum() == LocalPlayer():GetNW2Int("CPNum", 1) then
+			cam.Start3D()
+			cppos = v:GetPos()
+			cppos.z = cppos.z + 50
+			local testtrace = {
+				start = EyePos(),
+				endpos = cppos,
+				filter = LocalPlayer()
+			}
+			local cppos = cppos:ToScreen()
+			local cphidden = util.TraceLine(testtrace).Hit
+			cam.End3D()
+
+			draw.DrawText(v:GetCPNum() .. "/".. table.Count(Checkpoints) - 1, "BeatrunHUD", cppos.x, cppos.y, cphidden and cp_hidden_col or color_white, TEXT_ALIGN_CENTER)
+		end
+	end
+
+	color_positive.a = 255
+	color_negative.a = 255
+	color_neutral.a = 255
+end
+
 hook.Add("HUDPaint", "CourseHUD", CourseHUD)
+hook.Add("HUDPaint", "CheckpointOverlay", CheckpointOverlay)
 
 local function StartFreeze(ply, cmd)
 	cmd:ClearButtons()
