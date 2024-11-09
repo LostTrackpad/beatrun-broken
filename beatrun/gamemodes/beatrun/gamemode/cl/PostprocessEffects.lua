@@ -7,7 +7,7 @@ local function MyNeedsDepthPass()
 end
 
 -- Add hook so that the _rt_ResolvedFullFrameDepth texture is updated
---hook.Add( "NeedsDepthPass", "MyNeedsDepthPass", MyNeedsDepthPass )
+hook.Add( "NeedsDepthPass", "MyNeedsDepthPass", MyNeedsDepthPass )
 
 local blur_mat = Material('pp/bokehblur')
 local BOKEN_FOCUS = 0
@@ -20,28 +20,6 @@ hook.Add("RenderScreenspaceEffects", "funnybrdof", function()
     local ply = LocalPlayer()
 
 	render.UpdateScreenEffectTexture(1)
-
-	local trace = {}
-	if not ply:ShouldDrawLocalPlayer() then
-		eye = ply:EyePos()
-		langles = ply:EyeAngles()
-
-		if ply:InVehicle() then
-			langles = ply:GetVehicle():GetAngles() + langles
-		end
-	else
-		eye = EyePos()
-		langles = EyeAngles()
-		ignoreEnts = true
-	end
-	trace.start = ply:EyePos()
-	trace.endpos = langles:Forward() * 300 + eye
-	trace.filter = function(ent)
-		return true
-	end
-
-	local tr = util.TraceLine(trace)
-	local dist = tr.HitPos:Distance(ply:GetPos())
 
     if ply:GetSliding() or ply:GetClimbing() != 0 or ply:GetWallrun() == 1 or IsValid(ply:GetLadder()) then
 		BOKEN_FORCE = math.Clamp(BOKEN_FORCE + 0.03 * (FrameTime() * 66), 0,2)
@@ -56,14 +34,9 @@ hook.Add("RenderScreenspaceEffects", "funnybrdof", function()
     blur_mat:SetFloat("$focus", 0)
     blur_mat:SetFloat("$focusradius", 2 - 0.25 * 2)
     
-    --blur_mat:SetFloat("$size", BOKEN_FORCE * 3)
-    --blur_mat:SetFloat("$focus", 0)
-    --blur_mat:SetFloat("$focusradius", 2 - 0.5 * 3)
-    --print(BOKEN_FOCUS)
-    
     --render.SetMaterial(fbtexture)
     --render.DrawScreenQuadEx(0,0,960,540)
     render.SetMaterial(blur_mat)
     render.DrawScreenQuad()
-    --render.DrawTextureToScreenRect(render.GetResolvedFullFrameDepth(),960,0,960,540)
+    --render.DrawTextureToScreen(render.GetResolvedFullFrameDepth())
 end)
