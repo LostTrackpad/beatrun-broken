@@ -75,7 +75,8 @@ end
 function GM:PlayerSpawn(ply, transition)
 	player_manager.SetPlayerClass(ply, "player_beatrun")
 
-	ply:StripAmmo()
+	-- Fuck you. Don't strip the player's ammo.
+	--ply:StripAmmo()
 
 	BaseClass.PlayerSpawn(self, ply, transition)
 
