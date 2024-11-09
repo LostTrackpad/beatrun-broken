@@ -283,6 +283,7 @@ local function WallrunningThink(ply, mv, cmd)
 		end
 
 		if mv:KeyPressed(IN_JUMP) and ply:GetWallrunTime() - CurTime() ~= hwrtime then
+			ply.WallboostTime = CurTime() + 0.12
 			ply:SetQuickturn(false)
 			ply:SetWallrunTime(0)
 			ply:SetSafetyRollKeyTime(CurTime() + 0.001)
@@ -416,6 +417,7 @@ local function WallrunningCheck(ply, mv, cmd)
 				ply.WallrunOrigAng = angdir
 				ply:SetWallrunData(1, CurTime() + vwrtime * timemult * speedmult, wallnormal)
 				ply:ViewPunch(Angle(-5, 0, 0))
+				if CLIENT then input.SelectWeapon(ply:GetWeapon("runnerhands")) end
 
 				ParkourEvent("wallrunv", ply)
 
@@ -476,6 +478,7 @@ local function WallrunningCheck(ply, mv, cmd)
 				net.Send(ply)
 			end
 
+			ply.WallboostTime = CurTime() + 0.12
 			return
 		end
 	end
@@ -518,6 +521,7 @@ local function WallrunningCheck(ply, mv, cmd)
 				net.Send(ply)
 			end
 
+			ply.WallboostTime = CurTime() + 0.12
 			return
 		end
 	end
@@ -526,6 +530,8 @@ end
 local vecdir = Vector(1000, 1000, 1000)
 
 hook.Add("SetupMove", "Wallrunning", function(ply, mv, cmd)
+	ply.WallboostTime = ply.WallboostTime or 0
+	ply.LastWallrunDir = ply.LastWallrunDir or vector_origin
 	if ply:GetWallrun() == nil or not ply:Alive() or (CrueltyParkour:GetBool() and !ply:UsingRH() and !SlippyWallrun:GetBool()) then
 		ply:SetWallrun(0)
 	end
@@ -537,7 +543,22 @@ hook.Add("SetupMove", "Wallrunning", function(ply, mv, cmd)
 		end
 	end
 
-	if ply:GetWallrun() ~= 0 then
+	if ply.WallboostTime > CurTime() and mv:KeyPressed(IN_JUMP) and ply:GetWallrun() == 0 and !ply:OnGround() and not mv:KeyDown(IN_DUCK) then
+		-- ME1-style-ish wallboosting implementation. Lots of shit code, you have been warned.
+		local vel = mv:GetVelocity()
+		vertspeed = vel.z
+		vel.z = 0
+
+		local wallangle = ply.LastWallrunDir:Angle()
+		wallangle:RotateAroundAxis(Vector(0,0,1), 180)
+
+		-- I know this is bullshit, if you know how to get velocity direction tell me
+		--print((vel:Length() + 180) / vel:Length())
+		vel:Mul((vel:Length() + 180) / vel:Length())
+		vel.z = vertspeed
+		mv:SetVelocity(vel)
+	elseif ply:GetWallrun() ~= 0 then
+		ply.LastWallrunDir = ply:GetWallrunDir()
 		WallrunningThink(ply, mv, cmd)
 	end
 
@@ -545,4 +566,17 @@ hook.Add("SetupMove", "Wallrunning", function(ply, mv, cmd)
 		ply:SetWallrunDir(vecdir)
 		ply:SetWallrunCount(0)
 	end
+
+	if ply:OnGround() then ply.WallboostTime = 0 end
+end)
+
+hook.Add("HUDPaint", "WallboostDebug", function()
+	--[[local ply = LocalPlayer()
+	local eyePos = ply:EyePos()
+	local plyEyeTrace = ply:GetEyeTrace()
+	local plyEyeTraceSurfaceHitDir = plyEyeTrace.HitNormal:Angle()
+	plyEyeTraceSurfaceHitDir:RotateAroundAxis(Vector(0,0,1), 180)
+	local x = Vector(5,5,5)
+
+    debugoverlay.Line( plyEyeTrace.HitPos, plyEyeTrace.HitPos + plyEyeTraceSurfaceHitDir:Forward() * 100, engine.TickInterval(), color_white, true )]]
 end)
