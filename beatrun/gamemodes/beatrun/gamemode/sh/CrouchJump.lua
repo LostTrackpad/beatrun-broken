@@ -128,7 +128,8 @@ hook.Add("CreateMove", "VManipCrouchJumpDuck", function(cmd)
 	end
 
 	if ply:GetCrouchJumpBlocked() and cmd:KeyDown(IN_DUCK) then
-		cmd:SetButtons(bit.bor(cmd:GetButtons(), IN_BULLRUSH))
+		-- Okay, what the fuck is this line for?
+		--cmd:SetButtons(bit.bor(cmd:GetButtons(), IN_BULLRUSH))
 		cmd:RemoveKey(IN_DUCK)
 	end
 end)
