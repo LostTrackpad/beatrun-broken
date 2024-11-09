@@ -787,7 +787,7 @@ hook.Add("SetupMove", "Climbing", function(ply, mv, cmd)
 end)
 
 hook.Add("PlayerSwitchWeapon", "NoSwitchForClimbers", function(ply)
-	if ply:GetClimbing() != 0 then
+	if ply:GetClimbing() != 0 or ply:GetWallrun() == 1 then
 		return true
 	end
 end)
