@@ -139,7 +139,8 @@ function PLAYER:Loadout()
 	if GetGlobalBool("GM_DATATHEFT") or GetGlobalBool("GM_DEATHMATCH") then
 		Beatrun_GiveGMWeapon(self.Player)
 	else
-		self.Player:RemoveAllAmmo()
+		-- Why are we doing this?
+		--self.Player:RemoveAllAmmo()
 	end
 
 	self.Player:Give("runnerhands")
@@ -364,17 +365,33 @@ end
 function PLAYER:CalcView(view)
 	if SERVER then return end
 	local ply = self.Player
+	local endlerp = endlerp or 0
 
 	if !ply:Alive() or !IsValid(ply) then return end
+
+	if IsValid(BodyAnim) then
+		if ply:ShouldDrawLocalPlayer() then
+			ply:SetNoDraw(false)
+			BodyAnim:SetNoDraw(true)
+			BodyAnim:SetRenderOrigin(view.origin * 1000)
+			return
+		else
+			ply:SetNoDraw(false)
+			BodyAnim:DrawShadow(true)
+			--BodyAnim:SetRenderOrigin(view.origin)
+		end
+	end
 
 	if ply:InVehicle() then
 		RemoveBodyAnim() return
 	end
 
-	if ply:GetActiveWeapon():GetClass() == "gmod_camera" then
-		BodyAnim:SetNoDraw(true)
-		BodyAnim:SetRenderOrigin(view.origin*1000)
-		return
+	if IsValid(ply:GetActiveWeapon()) then
+		if ply:GetActiveWeapon():GetClass() == "gmod_camera" then
+			BodyAnim:SetNoDraw(true)
+			BodyAnim:SetRenderOrigin(view.origin*1000)
+			return
+		end
 	end
 
 	-- What is this chunk even for? I don't really understand it so I commented it out.
@@ -463,6 +480,7 @@ function PLAYER:CalcView(view)
 			end
 
 			BodyAnim:SetAngles(oldang)
+			BodyAnim:SetNoDraw(true)
 		end
 		if attach ~= nil then
 			view.origin = has_tool_equipped and pos or attach.Pos
@@ -525,7 +543,7 @@ function PLAYER:CalcView(view)
 				attach.Ang = LerpAngle(endlerp * 2, attach.Ang, ply:EyeAngles() + ply:GetViewPunchAngles() + ply:GetCLViewPunchAngles())
 
 				if IsValid(vm) then
-					vm:SetNoDraw(false)
+					vm:SetNoDraw(true)
 				end
 			elseif not IsValid(BodyAnim) and endlerp == 1 then
 				attach = nil
@@ -533,7 +551,7 @@ function PLAYER:CalcView(view)
 				hook.Remove("CalcView", "BodyAnimCalcView2")
 
 				if IsValid(vm) then
-					vm:SetNoDraw(false)
+					vm:SetNoDraw(true)
 				end
 
 				return
@@ -559,7 +577,7 @@ function PLAYER:CalcView(view)
 
 				view.angles:Add(ply:GetViewPunchAngles() + ply:GetCLViewPunchAngles())
 
-				hook.Run("BodyAnimCalcView", view)
+				if IsValid(BodyAnim) then hook.Run("BodyAnimCalcView", view) end
 
 				if lerpchangeatt < 1 then
 					view.origin = lerpedpos
@@ -579,7 +597,6 @@ function PLAYER:CalcView(view)
 
 				return
 			else
-				ply:SetNoDraw(true)
 			end
 		end
 
@@ -589,6 +606,7 @@ function PLAYER:CalcView(view)
 
 			return
 		end
+		BodyAnim:SetNoDraw(true)
 	end
 	if self.TauntCam:CalcView(view, self.Player, self.Player:IsPlayingTaunt()) then return true end
 end
@@ -743,9 +761,6 @@ hook.Add("PlayerSpawn", "ResetStateTransition", function(ply, transition)
 			ply.ClimbingTrace = nil
 		end
 	end)
-end)
-
-hook.Add("PlayerSwitchWeapon", "BeatrunSwitchARC9FOVFix", function(ply)
 end)
 
 player_manager.RegisterClass("player_beatrun", PLAYER, "player_default")
