@@ -57,7 +57,7 @@ hook.Add("RenderScreenspaceEffects", "BeatrunNoclipBW", function()
 	local inp = color ~= 1
 	local noclipping = ply:GetMoveType() == MOVETYPE_NOCLIP and not BuildMode and ply:GetMantle() == 0 and ply:GetClimbing() == 0 and not IsValid(ply:GetLadder()) and not ply:InVehicle()
 
-	if noclipping or inp then
+	--[[if noclipping or inp then
 		tab["$pp_colour_colour"] = color
 		DrawColorModify(tab)
 	end
@@ -66,7 +66,7 @@ hook.Add("RenderScreenspaceEffects", "BeatrunNoclipBW", function()
 		color = math.Approach(color, 0.5, RealFrameTime())
 	elseif inp then
 		color = math.Approach(color, 1, RealFrameTime() * 2)
-	end
+	end]]
 
 	if ply:Health() < 100 then
 		tab["$pp_colour_colour"] = math.max(ply:Health() / ply:GetMaxHealth(), 0)
