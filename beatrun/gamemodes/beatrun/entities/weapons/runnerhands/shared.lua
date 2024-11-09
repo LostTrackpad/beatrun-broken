@@ -2,6 +2,7 @@ local windsound
 
 if CLIENT then
 	windsound = CreateClientConVar("Beatrun_Wind", 1, true, false, "Wind noises", 0, 1)
+	RespawnOnReload = CreateClientConVar("Beatrun_RespawnOnReload", 1, true, true, "Toggles respawning on +reload bind.", 0, 1)
 
 	SWEP.PrintName = "Runner Hands"
 	SWEP.Slot = 0
@@ -398,7 +399,7 @@ end
 function SWEP:Reload()
 	if GetGlobalBool("GM_DATATHEFT") or GetGlobalBool("GM_DEATHMATCH") or GetGlobalBool("GM_INFECTION") then return end
 
-	if not TUTORIALMODE and CurTime() > self.RespawnDelay and self:GetOwner():GetClimbing() == 0 and not IsValid(self:GetOwner():GetSwingbar()) and not self:GetOwner().BuildMode then
+	if not TUTORIALMODE and CurTime() > self.RespawnDelay and self:GetOwner():GetClimbing() == 0 and not IsValid(self:GetOwner():GetSwingbar()) and not self:GetOwner().BuildMode and tobool(self:GetOwner():GetInfo("Beatrun_RespawnOnReload")) then
 		self:GetOwner():Spawn()
 
 		-- if self:GetOwner():KeyDown(IN_USE) then
