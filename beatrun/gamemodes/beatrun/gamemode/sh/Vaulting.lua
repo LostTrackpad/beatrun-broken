@@ -719,7 +719,7 @@ hook.Add("SetupMove", "BeatrunVaulting", function(ply, mv, cmd)
 			ang.z = 0
 
 			if mantletype >= 2 and mantletype ~= 4 and mantletype ~= 5 then
-				mv:SetVelocity(ang:Forward() * math.Clamp(ply.MantleInitVel:Length(), 200, 600))
+				mv:SetVelocity(ang:Forward() * math.Clamp(ply.MantleInitVel:Length(), 200, GetConVar("sv_maxvelocity"):GetInt()))
 			end
 
 			ply:SetViewOffsetDucked(Vector(0, 0, 32))
