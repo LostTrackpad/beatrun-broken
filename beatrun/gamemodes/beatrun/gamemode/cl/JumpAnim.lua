@@ -1262,8 +1262,8 @@ local function JumpArmDraw(a, b, c)
 				local armoff = LocalToWorld(armoffset, angle_zero, vector_origin, BodyAnim:GetAngles())
 				
 				cam.IgnoreZ(ignorezarm[BodyAnimString] or false)
-				bac:SetAngles(ang)
-				bac:SetPos(pos + armoff)
+				bac:SetAngles(BodyAnim:GetAngles())
+				bac:SetPos(BodyAnim:GetPos() + armoff)
 				bac:SetRenderOrigin(nil)
 				
 				BodyAnimMDLarm:SetPos(BodyAnim:GetPos() + armoff)
