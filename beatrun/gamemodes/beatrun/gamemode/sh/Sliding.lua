@@ -246,7 +246,7 @@ end
 
 hook.Add("SetupMove", "qslide", function(ply, mv, cmd)
 	if not ply:Alive() then return end
-	if ply:GetSafetyRollKeyTime() > CurTime() then return end
+	if ply:GetSafetyRollKeyTime() > CurTime() or ply:GetJumpTurn() then return end
 
 	if not ply.OldDuckSpeed then
 		ply.OldDuckSpeed = ply:GetDuckSpeed()
