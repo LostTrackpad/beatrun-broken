@@ -7,6 +7,8 @@ local lastGroundSpeed = 0
 local rollspeedloss = CreateConVar("Beatrun_RollSpeedLoss", 1, {FCVAR_REPLICATED, FCVAR_ARCHIVE}, "", 0, 1)
 
 local function SafetyRollThink(ply, mv, cmd)
+	if ply:GetDive() and mv:KeyDown(IN_DUCK) then return end
+
 	local speed = mv:GetVelocity().z
 
 	if speed <= -350 and not ply:OnGround() and not ply:GetWasOnGround() and (mv:KeyPressed(IN_DUCK) or mv:KeyPressed(IN_SPEED) or mv:KeyPressed(IN_BULLRUSH)) then
