@@ -108,6 +108,7 @@ net.Receive("RollAnimSP", function()
 end)
 
 hook.Add("SetupMove", "EvadeRoll", function(ply, mv, cmd)
+	if ply:GetDive() and mv:KeyDown(IN_DUCK) then return end
 	if ply:GetJumpTurn() and ply:OnGround() and mv:KeyPressed(IN_BACK) then
 		if CLIENT and ply:Alive() and IsValid(ply:GetActiveWeapon()) then
 			if weapons.IsBasedOn(ply:GetActiveWeapon():GetClass(), "mg_base") then
@@ -247,7 +248,7 @@ if SERVER then
 			return 0
 		end
 
-		if speed >= 800 and not ply:InOverdrive() and not ply:HasGodMode() then
+		if !ply:InOverdrive() and !ply:HasGodMode() then
 			if speed < 800 and CurTime() < ply:GetSafetyRollKeyTime() and not ply:GetCrouchJump() and not ply:Crouching() then
 				return 0
 			else
