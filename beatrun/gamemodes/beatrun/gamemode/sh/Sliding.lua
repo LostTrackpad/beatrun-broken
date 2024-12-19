@@ -668,6 +668,7 @@ hook.Add("PlayerFootstep", "qslidestep", function(ply)
 end)
 
 hook.Add("StartCommand", "qslidespeed", function(ply, cmd)
+	if ply:GetSafetyRollKeyTime() > CurTime() or ply:GetJumpTurn() then return end
 	if ply:GetSliding() then
 		cmd:RemoveKey(IN_SPEED)
 
