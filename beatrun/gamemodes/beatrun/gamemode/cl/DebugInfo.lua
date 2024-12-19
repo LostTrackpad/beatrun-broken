@@ -20,7 +20,7 @@ local color_red = Color(220, 20, 20)
 local startx = 0.2
 local starty = 0.75
 
-local debugdata = {"BodyAnim", "BodyAnimCycle", "BodyAnimString", "campos", "camang"}
+local debugdata = {"BodyAnim", "BodyAnimCycle", "BodyAnimString", "viewpos", "viewang"}
 
 local debugdata2 = {"BodyAnimArmCopy", "TraceCount"}
 
