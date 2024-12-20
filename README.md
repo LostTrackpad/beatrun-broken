@@ -1,3 +1,5 @@
+## COMPLETELY BROKEN. DO NOT USE.
+
 # Beatrun | Community edition
 
 * [Русский](./README_ru.md)\
